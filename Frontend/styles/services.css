@@ -161,6 +161,7 @@
 }
 
 @media (max-width: 900px) {
+  .services-section .section-top { margin-bottom: 0; padding-bottom: 12px; }
   .service__n {
     grid-column: 1 / -1;
     margin-bottom: -4px;

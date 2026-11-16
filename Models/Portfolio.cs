@@ -13,11 +13,11 @@ public static class Portfolio
 {
     private static readonly NavLink[] Navigation =
     [
-        new("work", "01", "Work"),
-        new("about", "02", "About"),
+        new("about", "01", "About"),
+        new("work", "02", "Works"),
         new("services", "03", "Services"),
         new("team", "04", "Team"),
-        new("contact", "05", "Contact"),
+        new("contact", "05", "Contacts"),
     ];
 
     private static readonly Project[] Projects =
@@ -66,8 +66,8 @@ public static class Portfolio
 
     private static readonly Service[] Services =
     [
-        new("01", "Web development for agencies", "Motion-heavy sites and CMS builds, built closely with your designers and delivered ready for your team to own.", ["Astro", "GSAP", "React", "TypeScript"], "web dev →"),
-        new("02", "AI & automation workflows", "Hands-on training and custom skills for tools like Claude Code, followed by the workflows your team needs. With an honest list of what not to automate.", ["Claude Code", "Custom Agents", "Tooling", "Workflows"], "ai workflows →"),
+        new("01", "Web development for agencies", "Motion-heavy sites and CMS builds, built closely with your designers and delivered ready for your team to own.", ["Next.js", "GSAP", "React", "TypeScript"], "web dev →"),
+        new("02", "AI & automation workflows", "Hands-on training and custom skills for tools like Codex, followed by the workflows your team needs. With an honest list of what not to automate.", ["Codex", "Custom Agents", "Tooling", "Workflows"], "ai workflows →"),
         new("03", "AI in products & systems architecture", "Semantic search and assistants grounded in your content, tested on the questions real users ask, answering with sources and verifiable telemetry.", ["RAG", "Semantic Search", "PostgreSQL", "Real-time Sync"], "systems →"),
     ];
 
@@ -79,18 +79,18 @@ public static class Portfolio
             "ACTIVE · COMMITTING",
             "reticle"),
         new("alex-rivera", "DEV / 02", "Pixyz", "Frontend Development & Networking", "Responsive frontend development and networking, connecting accessible interfaces with reliable communication between systems.",
-            ["React", "JavaScript", "TCP/IP", "Wireshark"],
-            "https://github.com/marcKevzzz/dcd",
+            ["React", "JavaScript", "TCP/IP", "Cisco Packet Tracer"],
+            "https://github.com/Pixyz-bit",
             "ACTIVE · COMMITTING",
             "waveform"),
         new("christian-reyes", "DEV / 03", "Leo", "Frontend & Data Infrastructure", "Frontend interfaces and data infrastructure, bringing application screens, structured data, and API integrations together.",
             ["React", "TypeScript", "PostgreSQL", "Supabase"],
-            "https://github.com/marcKevzzz/dcd",
+            "https://github.com/Leokkise",
             "ACTIVE · COMMITTING",
             "matrix"),
         new("rafael-santos", "DEV / 04", "Chrstpr", "DevOps & Systems Deployment", "Automated CI/CD build environments, production containerization, load optimization, and server uptime.",
             ["Docker", "CI/CD Pipelines", "Cloud Hosting", "Performance"],
-            "https://github.com/marcKevzzz/dcd",
+            "https://github.com/ChrstprJohn",
             "ACTIVE · COMMITTING",
             "cube"),
     ];

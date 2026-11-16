@@ -157,7 +157,7 @@
 }
 @media (max-width: 700px) {
   .portfolio::before, .portfolio::after { display: none; }
-  .portfolio:has(.mobile-nav-ready) { --nav-height: 72px; }
+  .portfolio:has(.mobile-nav-ready) { --nav-height: 80px; }
   .mobile-nav-ready .header-bar {
     position: relative;
     grid-template-rows: 1fr;
@@ -177,7 +177,7 @@
     top: calc(100% + 6px);
     right: 0;
     width: 33vh;
-    height: 40dvh;
+    height: 44dvh;
     max-width: calc(100vw - 24px);
     max-height: calc(100dvh - var(--nav-height) - 24px);
     padding: 24px clamp(16px, 5vw, 32px) 14px;
@@ -206,7 +206,7 @@
   }
   .mobile-nav-ready nav > a {
     opacity: 0;
-    transition: opacity .08s ease;
+    transition: opacity .24s ease .32s;
   }
   .mobile-nav-ready.is-menu-open nav > a {
     opacity: 1;

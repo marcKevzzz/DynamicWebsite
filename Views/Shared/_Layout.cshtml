@@ -1,11 +1,31 @@
 @model PortfolioPage
+@{
+    var siteUrl = $"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.PathBase}/";
+    var shareImage = $"{Context.Request.Scheme}://{Context.Request.Host}{Url.Content("~/images/dcd-share.png")}";
+    const string description = "dcd.studio designs, builds, and deploys websites and software systems.";
+}
 <!doctype html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#1b1b1b" />
-    <meta name="description" content="dcd.studio designs, builds, and deploys websites and software systems." />
+    <meta name="description" content="@description" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="dcd.studio" />
+    <meta property="og:title" content="dcd.studio" />
+    <meta property="og:description" content="@description" />
+    <meta property="og:url" content="@siteUrl" />
+    <meta property="og:image" content="@shareImage" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="dcd. logo on a dark background" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="dcd.studio" />
+    <meta name="twitter:description" content="@description" />
+    <meta name="twitter:image" content="@shareImage" />
+    <meta name="twitter:image:alt" content="dcd. logo on a dark background" />
     <title>dcd.studio</title>
     <link rel="icon" type="image/svg+xml" href="~/favicon.svg" />
     <link rel="stylesheet" href="~/assets/site.css" asp-append-version="true" />

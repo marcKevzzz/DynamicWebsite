@@ -41,6 +41,7 @@ export function playOpening(gsap, reducedMotion) {
     .fromTo(words, { yPercent: 105, opacity: 0 }, { yPercent: 0, opacity: 1, stagger: 0.09, duration: 0.46, ease: 'power3.out' }, 'copy')
     .fromTo(details, { y: 13, opacity: 0 }, { y: 0, opacity: 1, stagger: 0.12, duration: 0.42, ease: 'power2.out' }, 'copy+=0.24')
     .call(() => root.classList.add('opening-nav-expanded'), [], 'copy')
+    .to({}, { duration: 0.25 })
   root.classList.remove('opening-pending')
   reducedMotion.addEventListener('change', event => { if (event.matches) skip() }, { once: true })
 }

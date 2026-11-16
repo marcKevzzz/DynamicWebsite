@@ -63,9 +63,11 @@
   line-height: 1.42;
   letter-spacing: -0.015em;
 }
-.about-note p span { display: block; }
+.about-note p span { display: inline; }
 @media (max-width: 767px) {
-  .manifesto { padding-bottom: 32px; }
+  .manifesto { padding-bottom: 80px; }
   .wf-line { font-size: calc((100cqi - 2 * var(--indent-step)) * 0.126); }
-  .about-note p { width: 64%; }
+  .about-note { justify-content: space-between; gap: 20px; }
+  .about-note p { flex: 1; width: auto; }
+  .about-mark { flex: none; font-size: calc(var(--about-copy-size) * 3.2); }
 }

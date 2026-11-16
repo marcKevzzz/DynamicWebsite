@@ -20,6 +20,10 @@ export function animateWorkGallery(gsap, ScrollTrigger) {
   ScrollTrigger.create({ trigger: work, start: 'top bottom', end: 'bottom top', onUpdate: updateCount, onRefresh: updateCount })
   gsap.matchMedia().add('(prefers-reduced-motion: no-preference)', () => {
     for (const item of items) {
+      gsap.fromTo(item, { opacity: 0 }, {
+        opacity: 1, duration: 0.8, ease: 'power2.out', clearProps: 'opacity',
+        scrollTrigger: { trigger: item, start: 'top 90%', once: true },
+      })
       const preview = item.querySelector('.work-preview')
       gsap.fromTo(preview, { yPercent: -8 }, {
         yPercent: 8, ease: 'none',

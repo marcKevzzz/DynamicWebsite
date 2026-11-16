@@ -17,19 +17,19 @@
         <nav class="footer-col" aria-label="Footer navigation">
             <p class="mono">Navigate</p>
             <ul>
-                <li><a href="#home">Home <span aria-hidden="true">↗</span></a></li>
+                <li><a href="#home"><span>Home</span><partial name="_Arrow" /></a></li>
                 @foreach (var link in Model.Where(link => link.Id != "contact"))
                 {
-                    <li><a href="#@link.Id">@link.Label <span aria-hidden="true">↗</span></a></li>
+                    <li><a href="#@link.Id"><span>@link.Label</span><partial name="_Arrow" /></a></li>
                 }
             </ul>
         </nav>
         <div class="footer-col">
             <p class="mono">Get in touch</p>
             <ul>
-                <li><a href="@emailLink">@email <span aria-hidden="true">↗</span></a></li>
-                <li><a href="@introLink">Ask for an intro call <span aria-hidden="true">↗</span></a></li>
-                <li><a href="@github" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a></li>
+                <li><a href="@emailLink"><span>@email</span><partial name="_Arrow" /></a></li>
+                <li><a href="@introLink"><span>Ask for an intro call</span><partial name="_Arrow" /></a></li>
+                <li><a href="@github" target="_blank" rel="noopener noreferrer"><span>GitHub</span><partial name="_Arrow" /></a></li>
             </ul>
             <div class="footer-socials">
                 <a class="circle-button" href="@github" target="_blank" rel="noopener noreferrer" aria-label="GitHub profile">

@@ -183,7 +183,7 @@
 .project-actions .button { min-height: 36px; padding-block: 5px; }
 .team-others.project-others { grid-template-rows: auto 1fr; align-content: stretch; gap: clamp(14px, 3dvh, 34px); }
 .project-others h4 { font-size: clamp(38px, min(6vw, 8dvh), 100px); }
-.project-others .project-other-list { display: grid; gap: 0; width: min(880px, 100%); margin-inline-start: auto; align-self: end; }
+.project-others .project-other-list { display: grid; grid-template-columns: minmax(0, 1fr); justify-content: stretch; gap: 0; width: 100%; margin-inline-start: 0; align-self: end; }
 .project-others .project-other:not([hidden]) {
   display: grid;
   grid-template-columns: minmax(24px, auto) 1fr auto;
@@ -198,6 +198,9 @@
 .project-other:is(:hover, :focus-visible) span:last-child { transform: translate(3px, -3px); }
 
 @media (max-width: 767px) {
+  .project-others .project-other-list { width: 100%; }
+  .team-chapter.project-others { padding-inline: 20px; }
+  .project-dialog .team-track .project-tools .team-chapter-link { margin-inline-start: auto; }
   .work { padding-top: 24px; }
   .work-index { min-height: 0; top: calc(50svh - 52px); padding-bottom: 0; align-content: start; }
   .work-gallery { padding-block: 55svh 10vh; grid-template-columns: repeat(6, minmax(0, 1fr)); column-gap: 10px; }

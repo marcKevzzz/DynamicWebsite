@@ -12,8 +12,8 @@ export async function smoke(tab) {
   await ui.locator('.header:not(.is-scrolled)').waitFor({ state: 'visible', timeoutMs: 10000 })
   const workAction = ui.locator('.header-cta')
   await workAction.waitFor({ state: 'hidden' })
-  assert(await read(() => document.querySelector('.header nav .nav-link:nth-child(2)').getAttribute('href') === '#about' &&
-    document.querySelector('#about .about-note p') && document.title === 'dcd.studio'), 'About is second and the studio title is present')
+  assert(await read(() => document.querySelector('.header nav .nav-link:first-child').getAttribute('href') === '#about' &&
+    document.querySelector('#about .about-note p') && document.title === 'dcd.studio'), 'About is first and the studio title is present')
 
   const hero = ui.locator('.hero')
   assert(await hero.getByRole('link', { name: 'Meet the team' }).isVisible(), 'Hero has the team link')

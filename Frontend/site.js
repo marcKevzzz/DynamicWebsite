@@ -219,7 +219,7 @@ media.add('(min-width: 768px) and (prefers-reduced-motion: no-preference)', () =
     duration: 1.05,
     anchors: true,
     prevent: element => Boolean(element.closest('dialog')),
-    virtualScroll: () => !root.classList.contains('reload-locked'),
+    virtualScroll: () => !root.matches('.reload-locked, .opening'),
   })
   lenis.on('scroll', ScrollTrigger.update)
   const tick = time => lenis.raf(time * 1000)

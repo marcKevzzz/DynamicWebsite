@@ -38,7 +38,7 @@
                     <div class="team-profile-copy">
                         <p class="team-profile-role">@project.Category</p>
                         <button type="button" class="team-chapter-link mono" data-team-chapter="1" aria-label="Tools of the trade">
-                            <span class="team-scroll-hint">Scroll for more</span><span aria-hidden="true"> →</span>
+                            <span class="team-scroll-hint">Scroll for more</span><partial name="_Arrow" />
                         </button>
                         <div class="project-description">
                             @foreach (var paragraph in project.Details)
@@ -66,7 +66,7 @@
                             {
                                 <a class="button button-small" href="@project.Url" target="_blank" rel="noopener noreferrer">Visit project <partial name="_Arrow" /></a>
                             }
-                            <button type="button" class="team-chapter-link mono" data-team-chapter="2" aria-label="Other projects">Other projects <span aria-hidden="true">→</span></button>
+                            <button type="button" class="team-chapter-link mono" data-team-chapter="2" aria-label="Other projects">Other projects <partial name="_Arrow" /></button>
                         </div>
                     </div>
                 </div>

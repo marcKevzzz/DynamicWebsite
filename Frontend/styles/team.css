@@ -78,7 +78,7 @@
   place-self: center;
   writing-mode: vertical-rl;
   transform: rotate(180deg);
-  font-size: min(19vw, calc(205dvh / var(--name-length)));
+  font-size: min(19vw, calc(190dvh / var(--name-length)));
 }
 .team-portrait {
   position: relative;
@@ -127,6 +127,7 @@
   color: var(--muted);
 }
 .team-chapter-link:hover { color: var(--accent); }
+.team-chapter-link > svg { width: 18px; height: 18px; }
 .team-tools {
   --tools-gutter: clamp(28px, 5vw, 76px);
   padding-inline: var(--tools-gutter);
@@ -294,10 +295,15 @@ html:has(.team-dialog[open]) { overflow: hidden; }
   .team-others-list { justify-content: space-between; }
 }
 @media (max-width: 767px) {
+  .team { padding-block: 72px 88px; }
+  .team-title { margin-block: 24px 40px; }
   .team-track { overflow: hidden auto; scroll-snap-type: none; }
   .team-track .team-card { display: flex; flex-direction: column; height: auto; min-height: 100%; }
   .team-track .team-chapter { flex: 0 0 auto; min-height: 0; overflow: visible; }
-  .team-track .team-tools .team-chapter-link { position: static; margin-top: 24px; justify-self: end; }
+  .team-track .team-tools .team-chapter-link { position: static; margin-top: 24px; justify-self: start; }
+  .team-track .team-chapter-link > svg { transform: rotate(90deg); }
+  .team-track .team-tools .team-chapter-link > svg { order: -1; }
+  .team-track .team-profile-role { width: 100%; max-width: none; }
   .team-track .team-others { gap: 28px; padding-bottom: 32px; }
   .team-dialog:not(.is-scrubbed) .team-scroll-hint::after { content: 'Scroll for more'; }
   .team-roster { row-gap: 22px; }

@@ -27,7 +27,7 @@
                         <p class="team-profile-role">@member.Role</p>
                         <button type="button" class="team-chapter-link mono" data-team-chapter="1"
                                 aria-label="Tools of the trade" data-cursor="tools →">
-                            <span class="team-scroll-hint">Scroll for more</span><span aria-hidden="true"> →</span>
+                            <span class="team-scroll-hint">Scroll for more</span><partial name="_Arrow" />
                         </button>
                         <p class="member-bio">@member.Bio</p>
                     </div>
@@ -49,7 +49,7 @@
                         }
                     </div>
                     <button type="button" class="team-chapter-link mono" data-team-chapter="2"
-                            aria-label="Other team members" data-cursor="teammates →">Other team members <span aria-hidden="true">→</span></button>
+                            aria-label="Other team members" data-cursor="teammates →">Other team members <partial name="_Arrow" /></button>
                 </div>
             </article>
         }
