@@ -1,92 +1,30 @@
 # dcd. portfolio
 
-Engineering portfolio for **dcd.** — Four developers, connected thinking.  
-React 19 + TypeScript + Vite + Tailwind CSS + GSAP + Lenis.
+Four developers building connected systems for healthcare, hospitality, and retail. ASP.NET Core MVC renders the portfolio from C# models and Razor views. Tailwind CSS styles the views, and GSAP, ScrollTrigger, and Lenis run the animations and smooth scrolling.
 
----
+## Run locally
 
-## Quick Start
+Install the .NET 10 SDK and Node.js 22.12 or newer.
 
 ```bash
-npm install
-npm run dev        # Starts Vite dev server at 127.0.0.1:5173
-npm run build      # Strict TypeScript check & production Vite build in dist/
-npm run preview    # Local preview of the production bundle
+dotnet run
 ```
 
----
+Open [the local portfolio](http://localhost:5080/). The .NET build installs the locked npm dependencies on the first run and compiles the frontend into `wwwroot/assets/`. Use `dotnet watch run` while editing.
 
-## Architectural Overview & Directory Structure
-
-To support team collaboration and maintain production velocity, code is strictly decoupled into modular, single-responsibility domains:
-
-```text
-src/
-├── components/          # Reusable, well-scoped UI components
-│   ├── common/          # Low-level primitives & shared UI (Arrow.tsx)
-│   ├── layout/          # Page chrome (Header.tsx, Footer.tsx, Cursor.tsx)
-│   ├── navigation/      # Shortcut & command dialog (ShortcutDialog.tsx)
-│   ├── sections/        # Major sections (Hero, Approach, WorkStage, Services, Team)
-│   └── work/            # Conceptual drawings & visual adapters (Blueprint.tsx, ProjectArt.tsx)
-├── context/             # App-level context providers (if needed)
-├── data/                # Strongly typed datasets (projects.ts, services.ts, navigation.ts)
-├── hooks/               # Encapsulated stateful lifecycle hooks:
-│   ├── useTheme.ts      # Circular view-transition theme switcher
-│   ├── useLenisScroll.ts# Lenis + GSAP ScrollTrigger sync + reduced-motion handling
-│   ├── useCursor.ts     # Blueprint interactive coordinate crosshair cursor
-│   └── useShortcuts.ts  # Cmd+K shortcut listener and focus restoration
-├── styles/              # Modular domain stylesheets
-│   ├── tokens.css       # Variables: --bg, --fg, --accent, typography, themes
-│   ├── base.css         # Resets, frame lines, common buttons, reduced-motion
-│   ├── cursor.css       # Blueprint crosshairs & coordinates
-│   ├── header.css       # Sticky nav & progress ruler
-│   ├── hero.css         # Hero statement typography & telemetry
-│   ├── manifesto.css    # Approach wireframe reveal
-│   ├── work.css         # Pinned work stage & blueprints
-│   ├── services.css     # Directional hover cards
-│   ├── team.css         # Team roster & marks
-│   ├── footer.css       # Footer
-│   └── dialog.css       # Command palette (⌘K)
-├── types/               # TypeScript interfaces & ambient declarations
-├── App.tsx              # Clean declarative orchestrator (<80 lines)
-├── index.css            # Central import hub (<15 lines)
-└── main.tsx             # Application bootstrap
+```bash
+dotnet build
+dotnet publish -c Release
 ```
 
----
+## Edit the portfolio
 
-## Team Standards & The Ponytail Philosophy
+- `Models/Portfolio.cs` contains the project, service, team, and navigation content.
+- `Views/Home/` contains the hero, manifesto, work, services, and team sections. `Views/Shared/` contains the layout, navigation, footer, and shortcuts.
+- `Frontend/` contains Tailwind CSS and browser interactions. `wwwroot/images/` contains the project captures and hero photography.
 
-This repository adheres to the **Ponytail** engineering philosophy: *The best code is the code you never wrote.*
+The home page follows the [Blueprint Apps](https://blueprintapps.io/) opening and [Pier Gorelli](https://piergorelli.com/) editorial sections. The hero uses generated editorial photographs and the portfolio's existing product screenshots.
 
-Before writing new code, developers and AI agents climb the **Laziness Ladder**:
-1. **YAGNI**: Does this feature or abstraction actually need to exist?
-2. **Reuse**: Check `src/components/`, `src/hooks/`, and `src/data/` first.
-3. **Standard Library**: Prefer native modern JS/TS APIs.
-4. **Native Platform Features**: Use native `<dialog>`, CSS variables, and native scrolling.
-5. **Existing Dependencies**: Never introduce new npm packages without team consensus.
-6. **The One-Line Solution**: Condense logic without compromising clarity.
-7. **The Minimum Working Solution**: Clean, minimal code preserving full accessibility and type safety.
+## Verify
 
-See [AGENTS.md](file:///c:/Users/QCU/source/repos/dcd/AGENTS.md) and [.agents/rules/ponytail.md](file:///c:/Users/QCU/source/repos/dcd/.agents/rules/ponytail.md) for full details.
-
----
-
-## Workspace Rules & Skills
-
-- **Rules (`.agents/rules/`)**:
-  - `ponytail.md`: The 7-step Laziness Ladder and anti-bloat guidelines.
-  - `architecture.md`: Folder structure conventions and component purity.
-  - `typescript.md`: Strict TypeScript standards (zero `any`, ambient typing).
-- **Skills (`.agents/skills/`)**:
-  - `ponytail`: Procedure for PR audits, eliminating over-engineering, and enforcing minimalist code.
-  - `component`: Blueprint for creating new production components.
-  - `verification`: Step-by-step checklist for production builds and accessibility tests.
-
----
-
-## Accessibility & Performance Features
-
-- **Keyboard Navigation**: `Ctrl/Cmd + K` opens the command dialog with auto-focus, arrow-key navigation, and `Escape` focus restoration.
-- **Theme Switching**: Native View Transition with circular clip-path animation and graceful fallback.
-- **Reduced Motion**: Honored via `prefers-reduced-motion: reduce`. GSAP scrubs and Lenis smooth scrolling are bypassed for accessibility while preserving full layout legibility.
+See [the verification checklist](docs/verification.md) for the browser smoke checks.

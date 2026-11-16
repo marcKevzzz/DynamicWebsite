@@ -1,0 +1,71 @@
+/* Manifesto / Approach (Unpinned & animated) */
+.manifesto {
+  padding-block: clamp(48px, 6vw, 106px) clamp(84px, 11vw, 168px);
+}
+.manifesto-stage {
+  --indent-step: clamp(24px, 10vw, 144px);
+  container-type: inline-size;
+  margin-top: clamp(36px, 4.5vw, 60px);
+  display: grid;
+  gap: clamp(12px, 2vw, 24px);
+}
+.wf-line {
+  position: relative;
+  width: max-content;
+  margin: 0;
+  font-size: calc((100cqi - 2 * var(--indent-step)) * 0.098);
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  line-height: 0.96;
+  white-space: nowrap;
+}
+.wf-line:nth-child(2) { margin-inline-start: var(--indent-step); }
+.wf-line:nth-child(3) { margin-inline-start: calc(2 * var(--indent-step)); }
+@media (max-width: 767px) {
+  .manifesto-stage { --indent-step: 5vw; }
+}
+.outline-text {
+  color: transparent;
+  -webkit-text-stroke: 1px var(--muted);
+}
+.wf-solid {
+  position: absolute;
+  inset: 0;
+  color: var(--fg);
+  clip-path: none;
+  will-change: clip-path;
+}
+
+.about-label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.15em; }
+.about-note {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  --about-copy-size: clamp(15px, 1.7vw, 25px);
+  gap: clamp(8px, 1.1vw, 18px);
+  margin-top: clamp(44px, 8vw, 130px);
+}
+.about-mark {
+  writing-mode: vertical-rl;
+  rotate: 180deg;
+  font-size: calc(var(--about-copy-size) * 2.05);
+  font-weight: 680;
+  line-height: 0.9;
+  letter-spacing: -0.09em;
+}
+.about-note p {
+  position: relative;
+  z-index: 1;
+  width: 40%;
+  background: var(--bg);
+  color: var(--muted);
+  font-size: var(--about-copy-size);
+  line-height: 1.42;
+  letter-spacing: -0.015em;
+}
+.about-note p span { display: block; }
+@media (max-width: 767px) {
+  .manifesto { padding-bottom: 32px; }
+  .wf-line { font-size: calc((100cqi - 2 * var(--indent-step)) * 0.126); }
+  .about-note p { width: 64%; }
+}

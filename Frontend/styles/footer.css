@@ -1,0 +1,43 @@
+.site-footer {
+  min-height: calc(100svh - var(--nav-height));
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: clamp(70px, 10vw, 160px);
+  padding-block: clamp(44px, 8vw, 120px) 0;
+  overflow: clip;
+  border-top: 1px solid var(--line);
+}
+.footer-top { display: grid; grid-template-columns: 1.55fr 0.65fr 0.85fr; gap: clamp(24px, 5vw, 80px); }
+.footer-intro h2 { margin: 0.18em 0 0.36em; font-size: clamp(40px, 5.7vw, 102px); line-height: 0.88; letter-spacing: -0.066em; font-weight: 530; }
+.footer-col > p { color: var(--muted); text-transform: uppercase; padding-bottom: 12px; }
+.footer-col ul { list-style: none; margin: 0; padding: 0; }
+.footer-col a {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 0;
+  border-top: 1px solid var(--line);
+  font-size: clamp(13px, 1.2vw, 20px);
+  transition: color 240ms ease, padding-inline 300ms var(--ease-out);
+}
+.footer-col a span { color: var(--accent); transition: transform 300ms var(--ease-out); }
+.footer-col a:is(:hover, :focus-visible) { padding-inline: 6px; color: var(--accent); }
+.footer-col a:is(:hover, :focus-visible) span { transform: translate(2px, -2px); }
+.footer-socials { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 14px; }
+.footer-col .footer-socials a { display: grid; place-content: center; flex: 0 0 38px; width: 38px; height: 38px; padding: 0; border: 1px solid var(--line); }
+.footer-col .footer-socials a:is(:hover, :focus-visible) { border-color: var(--accent); }
+.footer-mark { display: block; width: 100%; height: auto; fill: var(--fg); user-select: none; }
+.footer-mark text { font-size: 210px; font-weight: 520; letter-spacing: -0.065em; }
+.footer-mark tspan { fill: var(--accent); }
+@media (max-width: 767px) {
+  .site-footer { min-height: auto; gap: 32px; padding-top: 32px; }
+  .footer-intro .button { min-height: 40px; padding: 9px 16px; font-size: 12px; gap: 18px; }
+  .footer-mark { height: clamp(80px, 23vw, 150px); }
+  .footer-top { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .footer-intro { grid-column: 1 / -1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .footer-col a:is(:hover, :focus-visible) { padding-inline: 0; }
+  .footer-col a:is(:hover, :focus-visible) span { transform: none; }
+}

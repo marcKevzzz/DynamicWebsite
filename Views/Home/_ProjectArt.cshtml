@@ -1,0 +1,11 @@
+@model Project
+@if (Model.Image is not null)
+{
+    <img class="work-image work-art-default @(Model.LightImage is not null ? "work-theme-dark" : "")" src="@Url.Content("~/images/" + Model.Image)" alt="" loading="lazy" decoding="async" />
+    <img class="work-image work-art-alternate @(Model.LightImage is not null ? "work-theme-dark" : "")" src="@Url.Content("~/images/" + (Model.AlternateImage ?? Model.Image))" alt="" loading="lazy" decoding="async" />
+    @if (Model.LightImage is not null)
+    {
+        <img class="work-image work-art-default work-theme-light" src="@Url.Content("~/images/" + Model.LightImage)" alt="" loading="lazy" decoding="async" />
+        <img class="work-image work-art-alternate work-theme-light" src="@Url.Content("~/images/" + (Model.LightAlternateImage ?? Model.LightImage))" alt="" loading="lazy" decoding="async" />
+    }
+}

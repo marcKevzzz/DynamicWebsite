@@ -1,0 +1,361 @@
+.team-title {
+  margin: clamp(48px, 7vw, 106px) 0 clamp(24px, 4vw, 54px);
+  font-size: clamp(20px, 2.35vw, 34px);
+  font-weight: 550;
+  letter-spacing: -0.03em;
+  text-align: center;
+}
+.team-roster {
+  display: grid;
+  justify-items: center;
+  row-gap: clamp(8px, 1.25vw, 20px);
+  list-style: none;
+  margin: 0;
+  padding: 0 0 clamp(24px, 5vw, 72px);
+}
+.team-person {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.025em;
+  width: fit-content;
+  padding: 0.025em 0.055em;
+  font-size: min(15.5vw, 225px);
+  font-weight: 650;
+  line-height: 0.84;
+  letter-spacing: -0.075em;
+  white-space: nowrap;
+  transition: color 260ms ease;
+}
+.team-person img {
+  display: block;
+  width: 0.42em;
+  height: 0.88em;
+  object-fit: contain;
+  transform-origin: center bottom;
+}
+.team :is(.team-person, .team-portrait, .team-other) img {
+  filter: grayscale(1);
+  transition: transform 420ms var(--ease-out), filter 300ms ease;
+}
+.team :is(.team-person, .team-other):focus-visible img { filter: grayscale(0); }
+@media (hover: hover) {
+  .team :is(.team-person, .team-portrait, .team-other):hover img { filter: grayscale(0); }
+}
+.team-roster > li:nth-child(even),
+.team-other:nth-child(even of :not([hidden])) { --avatar-lean: 6deg; }
+.team-person span {
+  transition: transform 420ms var(--ease-out);
+}
+.team-person:is(:hover, :focus-visible) { color: var(--accent); }
+.team-person:is(:hover, :focus-visible) img {
+  transform: rotate(var(--avatar-lean, -6deg)) scale(1.13);
+}
+.team-person:is(:hover, :focus-visible) span:first-child { transform: translateX(-0.04em); }
+.team-person:is(:hover, :focus-visible) span:last-child { transform: translateX(0.04em); }
+
+.team-card { scroll-margin-top: calc(var(--nav-height) + 20px); }
+.team-chapter {
+  position: relative;
+  display: grid;
+  align-items: center;
+  min-width: 0;
+  padding: clamp(28px, 5vw, 76px);
+}
+.team-profile {
+  grid-template-columns: 20% 48% 32%;
+  align-items: stretch;
+  padding: 0;
+}
+.team-profile-name,
+.team-tools h4,
+.team-others h4 {
+  font-weight: 650;
+  line-height: 0.95;
+  letter-spacing: -0.062em;
+}
+.team-profile-name {
+  place-self: center;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-size: min(19vw, calc(205dvh / var(--name-length)));
+}
+.team-portrait {
+  position: relative;
+  min-height: 0;
+  margin: 0;
+  background: var(--panel);
+}
+.team-portrait img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 32%;
+}
+#rafael-santos .team-portrait img { object-position: 69% 32%; }
+.team-profile-copy {
+  display: grid;
+  grid-template-rows: 1fr auto 1.65fr;
+  align-items: start;
+  justify-items: start;
+  padding: clamp(22px, 3.6dvh, 48px) clamp(24px, 3vw, 58px) clamp(22px, 3.6dvh, 48px) clamp(18px, 1.7vw, 36px);
+}
+.team-profile-role {
+  max-width: 24ch;
+  padding-inline-end: clamp(34px, 3.4vw, 65px);
+  color: var(--accent);
+  font-size: clamp(18px, 1.85vw, 36px);
+  line-height: 1.13;
+  letter-spacing: -0.032em;
+}
+.member-bio {
+  align-self: end;
+  max-width: 26ch;
+  color: var(--fg);
+  font-size: clamp(17px, 1.9vw, 36px);
+  line-height: 1.18;
+  letter-spacing: -0.027em;
+}
+.team-chapter-link { display: none; }
+.team-track .team-chapter-link {
+  display: flex;
+  align-items: center;
+  gap: 0.8em;
+  padding-block: 10px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.team-chapter-link:hover { color: var(--accent); }
+.team-tools {
+  --tools-gutter: clamp(28px, 5vw, 76px);
+  padding-inline: var(--tools-gutter);
+  background: var(--panel);
+}
+.team-tools h4 {
+  margin-block: 0.18em 0.24em;
+  font-size: clamp(36px, min(6vw, 10dvh), 94px);
+}
+.team-tools ul {
+  margin: 0 calc(-1 * var(--tools-gutter)) 24px;
+  padding: 0;
+  list-style: none;
+}
+.team-tools li {
+  display: flex;
+  align-items: baseline;
+  gap: 1.2em;
+  padding: 0.3em var(--tools-gutter);
+  border-bottom: 1px solid var(--line);
+  font-size: clamp(19px, min(3vw, 5.4dvh), 45px);
+  letter-spacing: -0.04em;
+}
+.team-tools li .mono { color: var(--accent); }
+.team-tools li { transition: background-color 240ms ease, border-color 240ms ease; }
+.team-tool-name { transition: transform 320ms var(--ease-out); }
+@media (hover: hover) {
+  .team-tools li:hover {
+    background-color: color-mix(in srgb, var(--accent) 8%, transparent);
+    border-bottom-color: var(--accent);
+  }
+  .team-tools li:hover .team-tool-name { transform: translateX(0.3em); }
+}
+.team-track .team-tools .team-chapter-link {
+  position: absolute;
+  right: clamp(28px, 5vw, 76px);
+  bottom: clamp(8px, 3dvh, 30px);
+}
+
+.team-others {
+  align-content: space-between;
+  align-items: start;
+  padding: clamp(24px, 2vw, 38px);
+}
+.team-others h4 { font-size: clamp(52px, 7.4vw, 142px); }
+.team-others-list {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: clamp(18px, 4.2vw, 80px);
+}
+.team-other:not([hidden]) {
+  display: grid;
+  place-items: end center;
+  gap: 12px;
+  width: clamp(64px, 11vw, 210px);
+  font-size: clamp(13px, 1.1vw, 21px);
+}
+.team-other img {
+  display: block;
+  width: 100%;
+  height: min(37dvh, 360px);
+  object-fit: contain;
+  transform-origin: center bottom;
+}
+.team-other:is(:hover, :focus-visible) { color: var(--accent); }
+.team-other:is(:hover, :focus-visible) img { transform: translateY(-7px) rotate(var(--avatar-lean, -6deg)) scale(1.08); }
+
+html:has(.team-dialog[open]) { overflow: hidden; }
+.team-dialog {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100dvh;
+  --team-distance: 200vw;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--fg);
+}
+.team-close {
+  --team-ring-track: color-mix(in srgb, var(--fg) 32%, var(--panel));
+  position: absolute;
+  z-index: 3;
+  top: max(16px, env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
+  display: grid;
+  place-items: center;
+  width: clamp(46px, 3vw, 60px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--panel);
+  color: var(--fg);
+  box-shadow: inset 0 0 0 1px var(--team-ring-track);
+  font-size: 23px;
+  line-height: 1;
+}
+.team-close::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: conic-gradient(var(--fg) var(--team-progress, 0turn), transparent 0);
+  mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px));
+  pointer-events: none;
+}
+.team-close:hover { color: var(--accent); }
+.team-scroll, .team-scroll-path, .team-track { height: 100%; }
+.team-scroll { overflow: hidden; }
+.team-track {
+  overflow: auto;
+  scrollbar-width: none;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior: contain;
+}
+.team-track .team-card {
+  display: grid;
+  grid-template-columns: repeat(3, 100%);
+  grid-template-rows: minmax(0, 1fr);
+  height: 100%;
+}
+.team-track .team-chapter {
+  min-height: 0;
+  overflow: hidden auto;
+  scrollbar-width: none;
+  scroll-snap-align: start;
+}
+.team-track .team-portrait img {
+  position: absolute;
+  inset: 0;
+}
+.team-dialog.is-scrubbed .team-scroll { overflow: hidden auto; scrollbar-width: none; }
+.team-dialog.is-scrubbed .team-scroll-path { height: calc(100% + var(--team-distance)); }
+.team-dialog.is-scrubbed .team-track {
+  position: sticky;
+  top: 0;
+  height: calc(100% - var(--team-distance));
+  overflow: hidden;
+  scroll-snap-type: none;
+}
+.team-dialog:not(.is-scrubbed) .team-scroll-hint { font-size: 0; }
+.team-dialog:not(.is-scrubbed) .team-scroll-hint::after { content: 'Swipe for more'; font-size: 10px; }
+
+@media (max-width: 767px), (max-height: 579px) {
+  .team-profile {
+    grid-template-columns: 21% 79%;
+    grid-template-rows: minmax(0, 55dvh) auto;
+  }
+  .team-profile-name { font-size: min(15vw, calc(100dvh / var(--name-length))); }
+  .team-profile-copy {
+    grid-column: 1 / -1;
+    grid-template-rows: auto 1fr auto;
+    row-gap: 10px;
+    padding: 20px;
+  }
+  .team-profile-role { padding: 0; }
+  .team-profile-copy .team-chapter-link { grid-row: 3; }
+  .member-bio { align-self: start; }
+  .team-tools { padding-block: 55px; }
+  .team-others { padding-top: 62px; }
+  .team-others-list { justify-content: space-between; }
+}
+@media (max-width: 767px) {
+  .team-track { overflow: hidden auto; scroll-snap-type: none; }
+  .team-track .team-card { display: flex; flex-direction: column; height: auto; min-height: 100%; }
+  .team-track .team-chapter { flex: 0 0 auto; min-height: 0; overflow: visible; }
+  .team-track .team-tools .team-chapter-link { position: static; margin-top: 24px; justify-self: end; }
+  .team-track .team-others { gap: 28px; padding-bottom: 32px; }
+  .team-dialog:not(.is-scrubbed) .team-scroll-hint::after { content: 'Scroll for more'; }
+  .team-roster { row-gap: 22px; }
+  .team-person { font-size: 17vw; }
+  .team-track .team-profile {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 20px;
+    padding: 76px 20px 24px;
+  }
+  .team-track .team-profile .team-profile-name {
+    align-self: flex-start;
+    width: 100%;
+    max-inline-size: 100%;
+    padding-right: 28px;
+    writing-mode: horizontal-tb;
+    transform: none;
+    font-size: clamp(34px, 10vw, 64px);
+    line-height: 1.02;
+    text-align: left;
+  }
+  .team-track .team-profile .team-portrait {
+    flex: 0 0 auto;
+    width: 100%;
+    height: 52dvh;
+    min-height: 240px;
+    border-radius: 18px;
+    overflow: hidden;
+  }
+  .team-track .project-profile .project-art {
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 16 / 10;
+  }
+  .team-track .team-profile-copy {
+    display: flex;
+    flex-direction: column;
+    flex: none;
+    gap: 16px;
+    padding: 0;
+  }
+  .team-track .team-profile-copy .team-chapter-link { order: 1; margin-top: 4px; }
+  .team-track .team-profile-copy :is(.member-bio, .project-description) {
+    align-self: stretch;
+    max-width: none;
+    font-size: 17px;
+    line-height: 1.45;
+  }
+  .team-track .team-tools { padding-top: 40px; }
+  .project-dialog .team-track .project-tools { padding-top: 40px; align-content: start; overflow: visible; }
+  .project-dialog .project-tools li { padding-block: 12px; font-size: clamp(20px, 5.5vw, 28px); }
+  .team-track .project-other:not([hidden]) { padding-block: 12px; font-size: 17px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .team-person, .team-person span, .team-tools li, .team-tool-name,
+  .team :is(.team-person, .team-portrait, .team-other) img { transition: none; }
+  .team-person:is(:hover, :focus-visible) :is(img, span),
+  .team-other:is(:hover, :focus-visible) img,
+  .team-tools li:hover .team-tool-name { transform: none; }
+}

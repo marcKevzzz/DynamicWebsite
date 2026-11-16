@@ -1,0 +1,113 @@
+/* CAD Crosshair Cursor matching reference */
+@media (pointer: fine) {
+  html.has-cursor:not(:has(.shortcut-dialog[open])),
+  html.has-cursor:not(:has(.shortcut-dialog[open])) * {
+    cursor: none !important;
+  }
+}
+.portfolio:has(.shortcut-dialog[open]) .cursor { visibility: hidden; }
+.cursor {
+  pointer-events: none;
+}
+.cursor__crosshair {
+  z-index: 51;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  position: fixed;
+  inset: 0;
+}
+.cursor.is-visible .cursor__crosshair,
+.cursor.is-visible .cursor__pt {
+  opacity: 1;
+}
+.cursor__h, .cursor__v {
+  background: var(--accent);
+  position: absolute;
+}
+.cursor__h {
+  opacity: 0.35;
+  height: 1px;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+.cursor__v {
+  opacity: 0.35;
+  width: 1px;
+  top: 0;
+  bottom: 0;
+  left: 0;
+}
+.cursor__pt {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 999;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.cursor__ring {
+  background: var(--accent);
+  border: 1.5px solid #ffffff;
+  outline: 1px solid rgba(0, 0, 0, 0.45);
+  width: 8px;
+  height: 8px;
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  border-radius: 0;
+  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              height 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              top 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              left 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              border-radius 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.2s ease,
+              background-color 0.2s ease,
+              outline 0.2s ease;
+}
+[data-theme=light] .portfolio .cursor__ring {
+  background: var(--accent);
+  border: 1.5px solid #000000;
+  outline: 1px solid rgba(255, 255, 255, 0.6);
+}
+.cursor.is-hover .cursor__ring {
+  border: 2px solid var(--accent);
+  background: rgba(115, 133, 255, 0.18);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  top: -18px;
+  left: -18px;
+  outline: none;
+  box-shadow: 0 0 0 1.5px #ffffff;
+}
+[data-theme=light] .portfolio .cursor.is-hover .cursor__ring {
+  border: 2px solid var(--accent);
+  background: rgba(61, 80, 206, 0.18);
+  outline: none;
+  box-shadow: 0 0 0 1.5px #000000;
+}
+.cursor.is-down .cursor__ring {
+  transform: scale(0.8);
+}
+.cursor__label {
+  white-space: nowrap;
+  color: var(--muted);
+  font-size: 9px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-family: var(--font-mono);
+  letter-spacing: 0.05em;
+  pointer-events: none;
+  transform: translate(14px, 10px);
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              color 0.2s ease,
+              opacity 0.2s ease;
+}
+.cursor.is-hover .cursor__label {
+  color: var(--accent);
+  transform: translate(26px, -8px);
+}

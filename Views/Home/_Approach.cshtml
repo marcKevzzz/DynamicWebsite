@@ -1,0 +1,18 @@
+<section class="manifesto section-shell" id="about" aria-labelledby="about-title">
+    <h2 id="about-title" class="about-label mono">About</h2>
+    <div class="manifesto-stage">
+        @foreach (var line in new[] { "Decide & design", "Code with intent", "Deploy with care" })
+        {
+            <p class="wf-line">
+                <span class="outline-text" aria-hidden="true">@line</span>
+                <span class="wf-solid">@line</span>
+            </p>
+        }
+    </div>
+    <div class="about-note">
+        <a href="#home" class="about-mark" aria-label="dcd. home">dcd<span class="accent">.</span></a>
+        <p><span>We’re four developers building websites and software systems.</span>
+            <span>We plan around how people actually work,</span>
+            <span>then carry the design and code through to production.</span></p>
+    </div>
+</section>

@@ -1,0 +1,79 @@
+@model TeamMember[]
+<section id="team" class="team section-shell" aria-labelledby="team-title">
+    <h2 id="team-title" class="team-title">Meet the team</h2>
+    <ul class="team-roster" role="list">
+        @foreach (var member in Model)
+        {
+            var split = (member.Name.Length + 1) / 2;
+            <li>
+                <a class="team-person" href="#@member.Id" aria-label="@member.Name" data-cursor="meet @member.Name ↗">
+                    <span aria-hidden="true">@member.Name[..split]</span>
+                    <img src="/images/team-@(member.Id).webp" alt="" loading="lazy" decoding="async" />
+                    <span aria-hidden="true">@member.Name[split..]</span>
+                </a>
+            </li>
+        }
+    </ul>
+    <div class="team-profiles">
+        @foreach (var member in Model)
+        {
+            <article id="@member.Id" class="team-card">
+                <div class="team-chapter team-profile">
+                    <h3 class="team-profile-name" style="--name-length: @member.Name.Length">@member.Name</h3>
+                    <figure class="team-portrait">
+                        <img src="/images/portrait-@(member.Id).webp" alt="" loading="lazy" decoding="async" />
+                    </figure>
+                    <div class="team-profile-copy">
+                        <p class="team-profile-role">@member.Role</p>
+                        <button type="button" class="team-chapter-link mono" data-team-chapter="1"
+                                aria-label="Tools of the trade" data-cursor="tools →">
+                            <span class="team-scroll-hint">Scroll for more</span><span aria-hidden="true"> →</span>
+                        </button>
+                        <p class="member-bio">@member.Bio</p>
+                    </div>
+                </div>
+                <div class="team-chapter team-tools">
+                    <div>
+                        <h4>Tools of the trade</h4>
+                        <ul role="list">
+                            @for (var i = 0; i < member.Stack.Length; i++)
+                            {
+                                <li><span class="mono" aria-hidden="true">@((i + 1).ToString("D2"))</span><span class="team-tool-name">@member.Stack[i]</span></li>
+                            }
+                        </ul>
+                        @if (member.Github is not null)
+                        {
+                            <a href="@member.Github" target="_blank" rel="noopener noreferrer" class="button button-small">
+                                <span>View GitHub</span><partial name="_Arrow" />
+                            </a>
+                        }
+                    </div>
+                    <button type="button" class="team-chapter-link mono" data-team-chapter="2"
+                            aria-label="Other team members" data-cursor="teammates →">Other team members <span aria-hidden="true">→</span></button>
+                </div>
+            </article>
+        }
+    </div>
+    <dialog class="team-dialog" aria-labelledby="team-dialog-title">
+        <h2 id="team-dialog-title" class="sr-only"></h2>
+        <button type="button" class="team-close" data-team-close aria-label="Close profile"
+                data-cursor="close" autofocus><span aria-hidden="true">×</span></button>
+        <div class="team-scroll" data-lenis-prevent>
+            <div class="team-scroll-path">
+                <div class="team-track"></div>
+            </div>
+        </div>
+        <div class="team-chapter team-others">
+            <h4>Other team<br />members</h4>
+            <div class="team-others-list">
+                @foreach (var member in Model)
+                {
+                    <a href="#@member.Id" class="team-other" aria-label="@member.Name" data-cursor="meet @member.Name ↗">
+                        <img src="/images/team-@(member.Id).webp" alt="" loading="lazy" decoding="async" />
+                        <span aria-hidden="true">@member.Name</span>
+                    </a>
+                }
+            </div>
+        </div>
+    </dialog>
+</section>

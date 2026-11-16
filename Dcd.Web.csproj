@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <DefaultItemExcludes>$(DefaultItemExcludes);node_modules/**;dist/**;wwwroot/assets/**</DefaultItemExcludes>
+  </PropertyGroup>
+  <ItemGroup>
+    <Watch Include="Frontend/**/*;package.json;package-lock.json;vite.config.mjs" />
+  </ItemGroup>
+  <Target Name="BuildFrontend" BeforeTargets="ResolveProjectStaticWebAssets" Condition="'$(DesignTimeBuild)' != 'true'">
+    <Exec Command="npm ci" Condition="!Exists('node_modules/vite/package.json')" />
+    <Exec Command="npm run build" />
+    <ItemGroup>
+      <Content Include="wwwroot/assets/**/*" CopyToPublishDirectory="PreserveNewest" />
+    </ItemGroup>
+  </Target>
+</Project>

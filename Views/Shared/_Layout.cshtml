@@ -1,0 +1,29 @@
+@model PortfolioPage
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#1b1b1b" />
+    <meta name="description" content="dcd.studio designs, builds, and deploys websites and software systems." />
+    <title>dcd.studio</title>
+    <link rel="icon" type="image/svg+xml" href="~/favicon.svg" />
+    <link rel="stylesheet" href="~/assets/site.css" asp-append-version="true" />
+    <script src="~/js/appearance.js" asp-append-version="true"></script>
+    <script type="module" src="~/assets/site.js" asp-append-version="true"></script>
+</head>
+<body>
+    <div id="home" class="portfolio">
+        <div class="opening-cover" aria-hidden="true"></div>
+        <div class="cursor" aria-hidden="true">
+            <div class="cursor__crosshair"><span class="cursor__h"></span><span class="cursor__v"></span></div>
+            <div class="cursor__pt"><span class="cursor__ring"></span><span class="cursor__label mono"></span></div>
+        </div>
+        <a class="skip-link" href="#main">Skip to content</a>
+        <partial name="_Header" model="Model.Navigation" />
+        <main id="main">@RenderBody()</main>
+        <partial name="_Footer" model="Model.Navigation" />
+        <partial name="_Shortcuts" model="Model.Navigation" />
+    </div>
+</body>
+</html>

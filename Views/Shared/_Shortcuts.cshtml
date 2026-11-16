@@ -1,0 +1,22 @@
+@model NavLink[]
+<dialog class="shortcut-dialog" data-lenis-prevent aria-label="Shortcut navigation">
+    <div class="command-search">
+        <span class="mono" aria-hidden="true">⌘ K</span>
+        <input id="command-search" aria-label="Search pages and actions" placeholder="Search pages and actions…" autocomplete="off"
+               role="combobox" aria-expanded="true" aria-autocomplete="list" aria-controls="command-results" autofocus />
+        <button type="button" class="mono" data-close-menu aria-label="Close shortcut menu">ESC</button>
+    </div>
+    <p class="mono command-label">GO TO / DO</p>
+    <div id="command-results" role="listbox" aria-label="Pages and actions">
+        <button type="button" role="option" id="command-home" data-target="home" tabindex="-1">Home<span class="mono">/</span></button>
+        @foreach (var link in Model)
+        {
+            <button type="button" role="option" id="command-@link.Id" data-target="@link.Id" tabindex="-1">
+                @(link.Id == "work" ? "Selected work" : link.Label)<span class="mono">/@link.Id</span>
+            </button>
+        }
+        <button type="button" role="option" id="command-theme" tabindex="-1">Toggle light / dark<span class="mono">THEME</span></button>
+    </div>
+    <p class="empty-results" role="status" hidden>No matches. Try “work”, “team”, or “theme”.</p>
+    <div class="command-footer mono">↑ ↓ NAVIGATE <span>ENTER TO SELECT</span></div>
+</dialog>

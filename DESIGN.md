@@ -2,12 +2,12 @@
 name: dcd.
 description: Four developers, connected thinking.
 colors:
-  background: '#0c0c0b'
+  background: '#1b1b1b'
   foreground: '#eeeee8'
-  muted: '#a2a29b'
-  border: '#30302d'
-  primary: '#7385ff'
-  blueprint-line: '#7385ff29'
+  muted: '#b0aea9'
+  border: '#3b3a38'
+  primary: '#8797ff'
+  blueprint-line: '#8797ff29'
   light-background: '#eeeee8'
   light-foreground: '#181918'
   light-muted: '#595b56'
@@ -17,10 +17,10 @@ colors:
 typography:
   display:
     fontFamily: 'Archivo Variable, sans-serif'
-    fontSize: 'clamp(90px, 11.4vw, 174px)'
-    fontWeight: 550
-    lineHeight: 0.94
-    letterSpacing: '-0.04em'
+    fontSize: 'clamp(42px, 5.8vw, 84px)'
+    fontWeight: 500
+    lineHeight: 1.04
+    letterSpacing: '-0.035em'
   headline:
     fontFamily: 'Archivo Variable, sans-serif'
     fontSize: 'clamp(48px, 6.2vw, 90px)'
