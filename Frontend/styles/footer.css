@@ -46,7 +46,7 @@
   .footer-intro > p { grid-column: 1 / -1; }
   .footer-intro h2 { font-size: clamp(26px, 7.5vw, 40px); margin-bottom: 24px; }
   .footer-col a { overflow-wrap: anywhere; }
-  .footer-socials { display: flex; flex-wrap: nowrap; gap: 4px; margin-top: 24px; }
+  .footer-socials { display: flex; flex-wrap: nowrap; justify-content: space-between; gap: 4px; margin-top: 24px; }
   .footer-col .footer-socials a { flex: 0 0 28px; width: 28px; height: 28px; }
   .footer-socials svg { width: 15px; height: 15px; }
 }

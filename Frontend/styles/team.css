@@ -80,6 +80,12 @@
   transform: rotate(180deg);
   font-size: min(19vw, calc(190dvh / var(--name-length)));
 }
+.team-profile-name:has(> .team-profile-fullname) { position: relative; font-size: min(17.5vw, calc(190dvh / var(--name-length))); }
+.team-profile-fullname { display: block; margin-block-start: 4px; font-size: 14px; font-weight: 400; line-height: 1.2; letter-spacing: 0; opacity: 0.65; }
+@media (min-width: 768px) {
+  .team-profile-fullname { position: absolute; inset-inline-start: 16px; inset-block-start: calc(100% - 20px); white-space: nowrap; }
+}
+.team-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .team-portrait {
   position: relative;
   min-height: 0;
@@ -109,6 +115,8 @@
   line-height: 1.13;
   letter-spacing: -0.032em;
 }
+.team-profile-identity { min-width: 0; }
+.team-owner-label { margin-bottom: 12px; color: var(--accent); text-transform: uppercase; }
 .member-bio {
   align-self: end;
   max-width: 26ch;
@@ -162,9 +170,13 @@
   .team-tools li:hover .team-tool-name { transform: translateX(0.3em); }
 }
 .team-track .team-tools .team-chapter-link {
-  position: absolute;
-  right: clamp(28px, 5vw, 76px);
-  bottom: clamp(8px, 3dvh, 30px);
+  position: static;
+  width: fit-content;
+  margin-top: 24px;
+  justify-self: start;
+}
+@media (min-width: 768px) {
+  .team-track .team-actions .team-chapter-link { margin-inline-start: auto; margin-top: 0; }
 }
 
 .team-others {
@@ -300,7 +312,8 @@ html:has(.team-dialog[open]) { overflow: hidden; }
   .team-track { overflow: hidden auto; scroll-snap-type: none; }
   .team-track .team-card { display: flex; flex-direction: column; height: auto; min-height: 100%; }
   .team-track .team-chapter { flex: 0 0 auto; min-height: 0; overflow: visible; }
-  .team-track .team-tools .team-chapter-link { position: static; margin-top: 24px; justify-self: start; }
+  .team-track .team-tools .team-chapter-link { position: static; margin-top: 12px; justify-self: start; }
+  .team-track .team-actions .team-chapter-link { flex-basis: 100%; }
   .team-track .team-chapter-link > svg { transform: rotate(90deg); }
   .team-track .team-tools .team-chapter-link > svg { order: -1; }
   .team-track .team-profile-role { width: 100%; max-width: none; }
@@ -353,9 +366,16 @@ html:has(.team-dialog[open]) { overflow: hidden; }
     font-size: 17px;
     line-height: 1.45;
   }
-  .team-track .team-tools { padding-top: 40px; }
-  .project-dialog .team-track .project-tools { padding-top: 40px; align-content: start; overflow: visible; }
-  .project-dialog .project-tools li { padding-block: 12px; font-size: clamp(20px, 5.5vw, 28px); }
+  .team-track .team-tools,
+  .project-dialog .team-track .project-tools { padding-block: 40px 55px; align-content: start; overflow: visible; gap: 0; }
+  .team-track .team-tools h4,
+  .project-dialog .project-tools h4 { margin-block: 0.18em 0; padding: 0; font-size: 36px; }
+  .team-track .team-tools ul,
+  .project-dialog .project-tools ul { margin-block: 24px; }
+  .team-track .team-tools li,
+  .project-dialog .project-tools li { padding: 12px var(--tools-gutter); font-size: 19px; gap: 1.2em; }
+  .project-actions .button { min-height: 42px; padding: 9px 16px; }
+  .team-profile-identity { align-self: stretch; }
   .team-track .project-other:not([hidden]) { padding-block: 12px; font-size: 17px; }
 }
 @media (prefers-reduced-motion: reduce) {

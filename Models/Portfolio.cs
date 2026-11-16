@@ -6,7 +6,7 @@ public sealed record Project(string Id, string Name, string Category, string[] D
     string? LightImage = null, string? LightAlternateImage = null);
 public sealed record Service(string Number, string Title, string Body, string[] Tags, string Cursor);
 public sealed record TeamMember(string Id, string Slot, string Name, string Role, string Bio, string[] Stack,
-    string? Github, string Status, string SvgShape);
+    string? Github, string Status, string SvgShape, string? FullName = null, string? Email = null, bool IsOwner = false);
 public sealed record PortfolioPage(NavLink[] Navigation, Project[] Projects, Service[] Services, TeamMember[] Team);
 
 public static class Portfolio
@@ -77,7 +77,7 @@ public static class Portfolio
             ["Figma", "GSAP", "CSS", "Accessibility"],
             "https://github.com/marcKevzzz",
             "ACTIVE · COMMITTING",
-            "reticle"),
+            "reticle", FullName: "Del Mundo, Marc Kevin F.", Email: "delmundo.marckevin.ferolino@gmail.com", IsOwner: true),
         new("alex-rivera", "DEV / 02", "Pixyz", "Frontend Development & Networking", "Responsive frontend development and networking, connecting accessible interfaces with reliable communication between systems.",
             ["React", "JavaScript", "TCP/IP", "Cisco Packet Tracer"],
             "https://github.com/Pixyz-bit",

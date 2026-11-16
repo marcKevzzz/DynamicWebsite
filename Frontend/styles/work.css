@@ -178,7 +178,10 @@
   gap: clamp(10px, 1.2vw, 20px);
 }
 .project-dialog .project-tools li .mono { flex: 0 0 2ch; }
-.project-dialog .team-track .project-tools .team-chapter-link { position: static; margin-inline-start: auto; padding-block: 4px; }
+.project-dialog .team-track .project-tools .team-chapter-link { position: static; margin-inline-start: 0; margin-top: 12px; padding-block: 10px; flex-basis: 100%; }
+@media (min-width: 768px) {
+  .project-dialog .team-track .project-tools .team-chapter-link { margin-inline-start: auto; margin-top: 0; flex-basis: auto; }
+}
 .project-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .project-actions .button { min-height: 36px; padding-block: 5px; }
 .team-others.project-others { grid-template-rows: auto 1fr; align-content: stretch; gap: clamp(14px, 3dvh, 34px); }
@@ -200,7 +203,6 @@
 @media (max-width: 767px) {
   .project-others .project-other-list { width: 100%; }
   .team-chapter.project-others { padding-inline: 20px; }
-  .project-dialog .team-track .project-tools .team-chapter-link { margin-inline-start: auto; }
   .work { padding-top: 24px; }
   .work-index { min-height: 0; top: calc(50svh - 52px); padding-bottom: 0; align-content: start; }
   .work-gallery { padding-block: 55svh 10vh; grid-template-columns: repeat(6, minmax(0, 1fr)); column-gap: 10px; }
