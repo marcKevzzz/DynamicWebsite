@@ -11,6 +11,7 @@ import { attachCursor } from './cursor.js'
 import { attachProfiles } from './team.js'
 
 gsap.registerPlugin(ScrollTrigger)
+gsap.ticker.lagSmoothing(0)
 
 const root = document.documentElement
 const header = document.querySelector('.header')
@@ -211,7 +212,10 @@ for (const section of document.querySelectorAll('#team, #work')) {
   attachProfiles(section, gsap, ScrollTrigger, reducedMotion, lockPage)
 }
 animateWorkGallery(gsap, ScrollTrigger)
-playOpening(gsap, reducedMotion)
+playOpening(gsap, reducedMotion, () => {
+  lenis?.resize()
+  ScrollTrigger.refresh()
+})
 
 const media = gsap.matchMedia()
 media.add('(min-width: 768px) and (prefers-reduced-motion: no-preference)', () => {
@@ -219,7 +223,11 @@ media.add('(min-width: 768px) and (prefers-reduced-motion: no-preference)', () =
     duration: 1.05,
     anchors: true,
     prevent: element => Boolean(element.closest('dialog')),
-    virtualScroll: () => !root.matches('.reload-locked, .opening'),
+    virtualScroll: ({ event }) => {
+      if (!root.matches('.reload-locked, .opening')) return true
+      if (event.cancelable && !event.ctrlKey) event.preventDefault()
+      return false
+    },
   })
   lenis.on('scroll', ScrollTrigger.update)
   const tick = time => lenis.raf(time * 1000)

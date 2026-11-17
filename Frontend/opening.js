@@ -1,4 +1,4 @@
-export function playOpening(gsap, reducedMotion) {
+export function playOpening(gsap, reducedMotion, onComplete) {
   const root = document.documentElement
   if (!root.classList.contains('opening') || reducedMotion.matches) return
 
@@ -23,6 +23,7 @@ export function playOpening(gsap, reducedMotion) {
     onComplete: () => {
       root.classList.remove('opening', 'opening-nav-expanded')
       gsap.set([cover, ...cards, ...words, ...details, ...captions], { clearProps: 'opacity,visibility,transform' })
+      onComplete?.()
     },
   })
   const skip = () => intro.progress(1)

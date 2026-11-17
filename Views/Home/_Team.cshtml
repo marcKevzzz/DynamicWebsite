@@ -19,8 +19,8 @@
         {
             <article id="@member.Id" class="team-card">
                 <div class="team-chapter team-profile">
-                    <h3 class="team-profile-name" style="--name-length: @member.Name.Length">
-                        @member.Name
+                    <h3 class="team-profile-name" style="--name-length: @(member.Name == "Chrstpr" ? 6 : member.Name.Length)">
+                        <span class="team-profile-alias">@member.Name</span>
                         @if (member.FullName is not null)
                         {
                             <span class="team-profile-fullname">@member.FullName</span>
