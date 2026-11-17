@@ -4,6 +4,7 @@
 }
 
 :root {
+  --close-button-size: clamp(46px, 3vw, 60px);
   font-family: var(--font-sans);
   font-synthesis: none;
   text-rendering: optimizeLegibility;

@@ -1,0 +1,31 @@
+@model SignInViewModel
+@{
+    Layout = "_AccountLayout";
+    ViewData["Title"] = "Sign in";
+}
+<h1 id="account-title" class="account-title account-title-single">Welcome back.</h1>
+<p class="account-description">Sign in to explore our latest projects and the people behind them.</p>
+<form asp-action="SignIn" method="post" class="account-form" data-account-form>
+    <div asp-validation-summary="ModelOnly" class="account-status" role="alert"></div>
+    <div class="account-field">
+        <label asp-for="Email"></label>
+        <input asp-for="Email" type="email" autocomplete="email" inputmode="email" required maxlength="254" aria-describedby="Email-error" placeholder="you@example.com" />
+        <span asp-validation-for="Email" id="Email-error" class="account-field-message" aria-live="polite"></span>
+    </div>
+    <div class="account-field">
+        <label asp-for="Password"></label>
+        <div class="account-password">
+            <input asp-for="Password" autocomplete="current-password" required  maxlength="128" aria-describedby="Password-error" placeholder="Your password" />
+            <button type="button" class="account-password-toggle" data-password-toggle aria-controls="Password" aria-label="Show password" aria-pressed="false">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="account-eye-slash" d="m4 4 16 16"/></svg>
+            </button>
+        </div>
+        <span asp-validation-for="Password" id="Password-error" class="account-field-message" aria-live="polite"></span>
+    </div>
+    <div class="account-recovery-link"><a asp-action="ForgotPassword">Forgot password?</a></div>
+    <button type="submit" class="button account-submit">Sign in <partial name="_Arrow" /></button>
+</form>
+<div class="account-links">
+    <p>New here? <a asp-action="SignUp">Create an account</a></p>
+    <a asp-action="Terms" class="account-terms-link">Terms &amp; conditions</a>
+</div>

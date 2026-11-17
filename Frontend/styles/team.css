@@ -246,7 +246,7 @@ html:has(.team-dialog[open]) { overflow: hidden; }
   right: max(16px, env(safe-area-inset-right));
   display: grid;
   place-items: center;
-  width: clamp(46px, 3vw, 60px);
+  width: var(--close-button-size);
   aspect-ratio: 1;
   border-radius: 50%;
   background: var(--panel);

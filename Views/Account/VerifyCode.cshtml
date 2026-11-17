@@ -1,0 +1,22 @@
+@model RecoveryCodeViewModel
+@{
+    Layout = "_AccountLayout";
+    ViewData["Title"] = "Verification code";
+}
+<h1 id="account-title" class="account-title account-title-single">Enter your code.</h1>
+<p class="account-description">Use the six-digit code from your recovery email to continue.</p>
+<form asp-action="VerifyCode" method="post" class="account-form" data-account-form>
+    <div asp-validation-summary="ModelOnly" class="account-status" role="alert"></div>
+    <div class="account-field">
+        <label asp-for="Code"></label>
+        <div class="account-code-entry">
+            <input asp-for="Code" type="text" autocomplete="one-time-code" inputmode="numeric" required minlength="6" maxlength="6" pattern="[0-9]{6}" aria-describedby="Code-error" placeholder="000000" data-code-input />
+        </div>
+        <span asp-validation-for="Code" id="Code-error" class="account-field-message" aria-live="polite"></span>
+    </div>
+    <button type="submit" class="button account-submit">Verify code <partial name="_Arrow" /></button>
+</form>
+<div class="account-links">
+    <p>Need another code? <a asp-action="ForgotPassword">Start again</a></p>
+    <a asp-action="SignIn">Back to sign in</a>
+</div>

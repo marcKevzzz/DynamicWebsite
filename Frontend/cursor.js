@@ -6,7 +6,7 @@ export function attachCursor(gsap) {
   const label = cursor.querySelector('.cursor__label')
   const hero = document.querySelector('.hero')
   const followOptions = { duration: 0.6, ease: 'power3.out' }
-  const layers = [...hero.querySelectorAll('[data-depth]')].flatMap(card =>
+  const layers = [...(hero?.querySelectorAll('[data-depth]') ?? [])].flatMap(card =>
     [...card.querySelectorAll('img, .hero-caption')].map(layer => ({
       depth: Number(card.dataset.depth) * (layer.matches('.hero-caption') ? 0.35 : 1),
       x: gsap.quickTo(layer, 'x', followOptions),

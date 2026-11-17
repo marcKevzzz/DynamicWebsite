@@ -6,7 +6,7 @@
     ? saved
     : matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
 
-  if (performance.getEntriesByType('navigation')[0]?.type === 'reload') {
+  if (root.dataset.page !== 'account' && performance.getEntriesByType('navigation')[0]?.type === 'reload') {
     history.scrollRestoration = 'manual'
     if (location.hash) history.replaceState(history.state, '', location.pathname + location.search)
     window.scrollTo(0, 0)
@@ -14,7 +14,7 @@
     window.setTimeout(() => root.classList.remove('reload-locked'), 1000)
   }
 
-  if (!location.hash && matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+  if (root.dataset.page !== 'account' && !location.hash && matchMedia('(prefers-reduced-motion: no-preference)').matches) {
     root.classList.add('opening', 'opening-pending')
     window.setTimeout(() => {
       if (root.classList.contains('opening-pending')) root.classList.remove('opening', 'opening-pending')

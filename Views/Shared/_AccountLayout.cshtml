@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en" data-page="account">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#1b1b1b" />
+    <meta name="robots" content="noindex" />
+    <title>@ViewData["Title"] · dcd.studio</title>
+    <link rel="icon" type="image/svg+xml" href="~/favicon.svg" />
+    <link rel="stylesheet" href="~/assets/site.css" asp-append-version="true" />
+    <script src="~/js/appearance.js" asp-append-version="true"></script>
+    <script type="module" src="~/assets/account.js" asp-append-version="true"></script>
+</head>
+<body class="account-body">
+    <div class="cursor" aria-hidden="true">
+        <div class="cursor__crosshair"><span class="cursor__h"></span><span class="cursor__v"></span></div>
+        <div class="cursor__pt"><span class="cursor__ring"></span><span class="cursor__label mono"></span></div>
+    </div>
+    <a class="skip-link" href="#account-main">Skip to form</a>
+    <svg class="account-shape-definitions" width="0" height="0" aria-hidden="true" focusable="false">
+        <defs>
+            <clipPath id="account-image-shape" clipPathUnits="objectBoundingBox">
+                <path d="M.04 0H.835Q.875 0 .875 .032V.043Q.875 .075 .915 .075H.96Q1 .075 1 .107V.968Q1 1 .96 1H.04Q0 1 0 .968V.032Q0 0 .04 0Z" />
+            </clipPath>
+        </defs>
+    </svg>
+    <div class="account-toast-announcer sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+    <section class="account-toasts" aria-label="Notifications" hidden></section>
+    <div class="account-shell">
+        <section class="account-pane" aria-labelledby="account-title">
+            <header class="account-header">
+                <a href="/" class="brand" aria-label="dcd. home">dcd<span class="accent">.</span></a>
+            </header>
+            <main id="account-main" class="account-main">@RenderBody()</main>
+        </section>
+        <aside class="account-visual" aria-label="A quiet studio workspace">
+            <img src="~/images/account-studio.png" alt="A laptop and architectural paper study on a studio desk in soft evening light." fetchpriority="high" />
+            <div class="account-visual-copy"><p>Good things<br />start here<span>.</span></p></div>
+            <p class="account-visual-signature mono">Decide &amp; design.<br />Code. Deploy.</p>
+        </aside>
+        <a href="@(ViewData["CloseToSignIn"] is true ? "/account/sign-in" : "/")" class="circle-button account-close" aria-label="@(ViewData["CloseToSignIn"] is true ? "Back to sign in" : "Back to website")" data-cursor="back">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+        </a>
+    </div>
+</body>
+</html>

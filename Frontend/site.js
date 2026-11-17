@@ -9,6 +9,7 @@ import { playOpening } from './opening.js'
 import { animateWorkGallery } from './work.js'
 import { attachCursor } from './cursor.js'
 import { attachProfiles } from './team.js'
+import { attachTheme } from './theme.js'
 
 gsap.registerPlugin(ScrollTrigger)
 gsap.ticker.lagSmoothing(0)
@@ -18,53 +19,10 @@ const header = document.querySelector('.header')
 const hero = document.querySelector('.hero')
 const ruler = header.querySelector('.ruler-marker')
 const theme = header.querySelector('[data-theme]')
-const metaTheme = document.querySelector('meta[name="theme-color"]')
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)')
-const systemTheme = matchMedia('(prefers-color-scheme: light)')
-let hasThemeOverride = false
-let themeTransition
 let lenis
 
-try { hasThemeOverride = ['light', 'dark'].includes(localStorage.getItem('theme')) } catch {}
-
-function applyTheme(mode) {
-  root.dataset.theme = mode
-  theme.setAttribute('aria-label', mode === 'light' ? 'Switch to dark theme' : 'Switch to light theme')
-  metaTheme.content = getComputedStyle(root).getPropertyValue('--bg').trim()
-}
-
-function toggleTheme() {
-  const mode = root.dataset.theme === 'light' ? 'dark' : 'light'
-  const apply = () => {
-    hasThemeOverride = true
-    try { localStorage.setItem('theme', mode) } catch {}
-    applyTheme(mode)
-  }
-  if (!document.startViewTransition || reducedMotion.matches || themeTransition) {
-    themeTransition?.skipTransition()
-    apply()
-    return
-  }
-
-  const rect = theme.getBoundingClientRect()
-  const x = rect.left + rect.width / 2
-  const y = rect.top + rect.height / 2
-  const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y))
-  const transition = document.startViewTransition(apply)
-  themeTransition = transition
-  transition.ready.then(() => root.animate(
-    { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
-    { duration: 780, easing: 'cubic-bezier(0.3, 0.7, 0.25, 1)', pseudoElement: '::view-transition-new(root)' },
-  )).catch(() => {})
-  transition.finished.finally(() => { if (themeTransition === transition) themeTransition = undefined })
-}
-
-applyTheme(root.dataset.theme)
-theme.hidden = false
-theme.addEventListener('click', toggleTheme)
-systemTheme.addEventListener('change', event => {
-  if (!hasThemeOverride) applyTheme(event.matches ? 'light' : 'dark')
-})
+const toggleTheme = attachTheme(theme)
 
 const mobileNav = header.querySelector('nav')
 const menuToggle = header.querySelector('[data-mobile-nav]')
