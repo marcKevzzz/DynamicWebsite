@@ -1,0 +1,57 @@
+@model AdminRecordList
+<section class="admin-panel admin-record-table" data-record-list="@Model.Key" aria-label="@Model.Title">
+    <div class="admin-record-grid admin-record-columns" aria-hidden="true">
+        <span>#</span>
+        <span>@Model.IdentityHeading</span>
+        <span>@Model.DetailHeading</span>
+        <span>@Model.MetadataHeading</span>
+        <span>Action</span>
+    </div>
+    <ol class="admin-list" role="list">
+        @for (var index = 0; index < Model.Rows.Length; index++)
+        {
+            var row = Model.Rows[index];
+            var rowId = $"admin-row-{index}";
+            <li>
+                <a class="admin-record-grid admin-record-link" asp-controller="Admin" asp-action="Record"
+                   asp-route-sectionKey="@Model.Key" asp-route-recordKey="@row.Key"
+                   aria-labelledby="@(rowId)-action @(rowId)-title" aria-describedby="@(rowId)-detail @(rowId)-metadata">
+                    <span class="admin-record-number mono" aria-hidden="true">@((index + 1).ToString("D2"))</span>
+                    <span class="admin-list-identity admin-record-identity">
+                        @if (row.Image is { } image)
+                        {
+                            <img class="admin-row-image" src="@Url.Content($"~/images/{image}")" alt="" loading="lazy" />
+                        }
+                        else if (row.Initials is { } initials)
+                        {
+                            <span class="admin-row-icon admin-initials" aria-hidden="true">@initials</span>
+                        }
+                        else
+                        {
+                            <span class="admin-row-icon"><partial name="_AdminIcon" model="Model.Key" /></span>
+                        }
+                        <span class="admin-row-copy">
+                            <strong id="@(rowId)-title">@row.Title</strong>
+                            @if (!string.IsNullOrWhiteSpace(row.Subtitle))
+                            {
+                                <span>@row.Subtitle</span>
+                            }
+                        </span>
+                    </span>
+                    <span id="@(rowId)-detail" class="admin-record-detail">
+                        @if (row.Active is { } active)
+                        {
+                            <span class="admin-status" data-active="@(active ? "true" : "false")">@row.Detail</span>
+                        }
+                        else
+                        {
+                            <span class="admin-record-summary">@row.Detail</span>
+                        }
+                    </span>
+                    <span id="@(rowId)-metadata" class="admin-record-meta"><span class="admin-record-summary">@row.Metadata</span></span>
+                    <span id="@(rowId)-action" class="admin-record-action">View <partial name="_AdminIcon" model='"arrow-right"' /></span>
+                </a>
+            </li>
+        }
+    </ol>
+</section>

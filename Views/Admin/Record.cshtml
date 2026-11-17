@@ -1,0 +1,28 @@
+@model AdminPage
+@{
+    Layout = "_AdminLayout";
+    var record = Model.Record!;
+    var editable = record.SaveLabel is not null;
+}
+
+@section PageActions {
+    @if (editable)
+    {
+        <button class="button button-primary" type="submit" form="admin-page-form">
+            @record.SaveLabel <partial name="_AdminIcon" model='"arrow-up-right"' />
+        </button>
+    }
+}
+
+@if (editable)
+{
+    <form id="admin-page-form" class="admin-panel admin-single-panel" aria-label="@record.Title" data-admin-form>
+        <partial name="_Fields" model="new AdminForm(record.Fields, true, Model.Section.Key)" />
+    </form>
+}
+else
+{
+    <section class="admin-panel admin-single-panel" aria-label="@record.Title">
+        <partial name="_Fields" model="new AdminForm(record.Fields, false)" />
+    </section>
+}

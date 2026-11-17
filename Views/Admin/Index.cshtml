@@ -1,0 +1,33 @@
+@model AdminPage
+@{
+    Layout = "_AdminLayout";
+}
+@switch (Model.Section.Key)
+{
+    case "dashboard":
+    case "reports":
+        <partial name="_Overview" model='Model.Section.Key == "reports"' />
+        break;
+    case "home":
+    case "about":
+    case "contacts":
+        var fields = Model.Section.Key switch
+        {
+            "home" => AdminPreview.Home,
+            "about" => AdminPreview.Company,
+            _ => AdminPreview.Contact
+        };
+        <form id="admin-page-form" class="admin-panel admin-single-panel" aria-label="@Model.Section.Title settings" data-admin-form>
+            <partial name="_Fields" model="new AdminForm(fields, true, Model.Section.Key)" />
+        </form>
+        break;
+    case "works":
+    case "services":
+    case "team":
+    case "users":
+        <partial name="_ContentList" model="AdminRecords.Get(Model.Section.Key, Model.Portfolio)" />
+        break;
+    case "activity":
+        <partial name="_ActivityTimeline" />
+        break;
+}

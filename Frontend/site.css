@@ -13,3 +13,7 @@
 @import "./styles/dialog.css";
 
 @import "./styles/account.css";
+@import "./styles/admin.css";
+@import "./styles/admin-analytics.css";
+@import "./styles/admin-records.css";
+@import "./styles/admin-forms.css";

@@ -10,6 +10,7 @@ import { animateWorkGallery } from './work.js'
 import { attachCursor } from './cursor.js'
 import { attachProfiles } from './team.js'
 import { attachTheme } from './theme.js'
+import { attachCommands } from './commands.js'
 
 gsap.registerPlugin(ScrollTrigger)
 gsap.ticker.lagSmoothing(0)
@@ -68,89 +69,23 @@ window.addEventListener('resize', updateRuler)
 updateRuler()
 
 const dialog = document.querySelector('.shortcut-dialog')
-const search = dialog.querySelector('input')
-const options = [...dialog.querySelectorAll('[role="option"]')]
-const empty = dialog.querySelector('.empty-results')
-let visibleOptions = options
-let selected = 0
-let previousFocus
-
-function select(index) {
-  selected = index
-  for (const option of options) {
-    const active = option === visibleOptions[index]
-    option.classList.toggle('selected', active)
-    option.setAttribute('aria-selected', String(active))
-  }
-  if (visibleOptions[index]) search.setAttribute('aria-activedescendant', visibleOptions[index].id)
-  else search.removeAttribute('aria-activedescendant')
-}
-
-function filter() {
-  const query = search.value.trim().toLowerCase()
-  visibleOptions = options.filter(option => {
-    option.hidden = !option.textContent.toLowerCase().includes(query)
-    return !option.hidden
-  })
-  empty.hidden = visibleOptions.length !== 0
-  select(0)
-}
-
-function openMenu() {
-  if (dialog.open || document.querySelector(':is(.team-dialog, .project-dialog)[open]')) return
-  previousFocus = document.activeElement
-  search.value = ''
-  filter()
-  dialog.showModal()
-  lenis?.stop()
-  search.focus()
-}
-
-function runOption(option) {
-  dialog.close()
-  lenis?.start()
-  if (option.dataset.target) {
-    const target = document.getElementById(option.dataset.target)
-    target.tabIndex = -1
-    target.focus({ preventScroll: true })
-    if (lenis) lenis.scrollTo(target)
-    else target.scrollIntoView()
-  } else {
-    toggleTheme()
-  }
-}
-
-dialog.querySelector('[data-close-menu]').addEventListener('click', () => dialog.close())
-dialog.addEventListener('click', event => { if (event.target === dialog) dialog.close() })
-dialog.addEventListener('close', () => {
-  lenis?.start()
-  if (document.activeElement === document.body || dialog.contains(document.activeElement)) previousFocus?.focus()
+attachCommands(dialog, {
+  canOpen: () => !document.querySelector(':is(.team-dialog, .project-dialog)[open]'),
+  onOpen: () => lenis?.stop(),
+  onClose: () => lenis?.start(),
+  run(option) {
+    lenis?.start()
+    if (option.dataset.target) {
+      const target = document.getElementById(option.dataset.target)
+      target.tabIndex = -1
+      target.focus({ preventScroll: true })
+      if (lenis) lenis.scrollTo(target)
+      else target.scrollIntoView()
+    } else {
+      toggleTheme()
+    }
+  },
 })
-document.addEventListener('keydown', event => {
-  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
-    event.preventDefault()
-    if (dialog.open) dialog.close()
-    else openMenu()
-  }
-})
-search.addEventListener('input', filter)
-search.addEventListener('keydown', event => {
-  if (!visibleOptions.length) return
-  if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-    event.preventDefault()
-    const step = event.key === 'ArrowDown' ? 1 : -1
-    select((selected + step + visibleOptions.length) % visibleOptions.length)
-    visibleOptions[selected].scrollIntoView({ block: 'nearest' })
-  }
-  if (event.key === 'Enter') {
-    event.preventDefault()
-    runOption(visibleOptions[selected])
-  }
-})
-for (const option of options) {
-  option.addEventListener('pointerenter', () => select(visibleOptions.indexOf(option)))
-  option.addEventListener('click', () => runOption(option))
-}
 
 for (const row of document.querySelectorAll('.service__link')) {
   const setOrigin = event => {

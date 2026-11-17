@@ -10,7 +10,7 @@ export default defineConfig({
     emptyOutDir: true,
     cssCodeSplit: false,
     rollupOptions: {
-      input: { site: 'Frontend/site.js', account: 'Frontend/account.js' },
+      input: { site: 'Frontend/site.js', account: 'Frontend/account.js', admin: 'Frontend/admin.js' },
       output: {
         entryFileNames: '[name].js',
         assetFileNames: asset => asset.names.includes('style.css') ? 'site.css' : '[name]-[hash][extname]',

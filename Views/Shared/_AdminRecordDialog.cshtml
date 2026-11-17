@@ -1,0 +1,10 @@
+@model AdminRecordDialog
+<dialog id="@Model.Id" class="shortcut-dialog admin-record-dialog" aria-labelledby="@(Model.Id)-title">
+    <header class="admin-panel-header">
+        <h2 id="@(Model.Id)-title">@Model.Title</h2>
+        <button type="button" class="circle-button admin-icon-button" data-admin-dismiss aria-label="Close" autofocus>
+            <partial name="_AdminIcon" model='"close"' />
+        </button>
+    </header>
+    <partial name="_Fields" model="new AdminForm(Model.Fields, false)" />
+</dialog>

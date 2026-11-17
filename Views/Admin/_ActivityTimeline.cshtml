@@ -1,0 +1,33 @@
+@{
+    var groups = AdminPreview.Events
+        .Select((item, index) => (Item: item, Key: index + 1))
+        .OrderByDescending(entry => entry.Item.OccurredAt)
+        .GroupBy(entry => DateOnly.FromDateTime(entry.Item.OccurredAt));
+}
+<div class="admin-panel admin-activity-list" data-activity-list>
+    <div class="admin-timeline-columns" aria-hidden="true"><span>Time</span><span>Activity</span><span>Actor</span><span></span></div>
+    @foreach (var group in groups)
+    {
+        var dateKey = group.Key.ToString("yyyy-MM-dd");
+        <section class="admin-timeline-group" data-activity-date="@dateKey" aria-labelledby="activity-@dateKey">
+            <h2 id="activity-@dateKey" class="admin-timeline-date"><time datetime="@dateKey">@group.Key.ToString("dddd, MMMM d, yyyy")</time></h2>
+            <ul role="list">
+                @foreach (var entry in group)
+                {
+                    <li>
+                        <a class="admin-timeline-row" asp-action="Record" asp-route-sectionKey="activity" asp-route-recordKey="@entry.Key">
+                            <time class="admin-timeline-time" datetime="@entry.Item.OccurredAt.ToString("s")">@entry.Item.OccurredAt.ToString("h:mm tt")</time>
+                            <span class="admin-timeline-event">
+                                <span class="admin-row-icon"><partial name="_AdminIcon" model="entry.Item.Icon" /></span>
+                                <span class="admin-row-copy"><strong>@entry.Item.Action</strong><span>@entry.Item.Subject</span></span>
+                            </span>
+                            <span class="admin-timeline-actor">@entry.Item.Actor</span>
+                            <span class="admin-timeline-arrow"><partial name="_AdminIcon" model='"arrow-right"' /></span>
+                        </a>
+                    </li>
+                }
+            </ul>
+        </section>
+    }
+    <p class="admin-timeline-empty" data-activity-empty hidden>No activity in this date range.</p>
+</div>

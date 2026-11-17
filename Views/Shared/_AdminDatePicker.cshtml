@@ -1,0 +1,23 @@
+@model AdminDatePicker
+<div class="admin-date-picker" data-admin-date-picker>
+    <button type="button" class="admin-date-toggle" popovertarget="@Model.Id" aria-haspopup="dialog">
+        <partial name="_AdminIcon" model='"calendar"' />
+        <span data-date-caption>@Model.Caption</span>
+    </button>
+    <form id="@Model.Id" class="admin-date-popover" popover="auto" role="dialog" aria-labelledby="@(Model.Id)-title">
+        <p id="@(Model.Id)-title" class="admin-date-title">Date range</p>
+        <div class="admin-date-fields">
+            <label>From
+                <input type="date" name="start" aria-describedby="@(Model.Id)-error" required min="@Model.Earliest.ToString("yyyy-MM-dd")" max="@Model.Latest.ToString("yyyy-MM-dd")" value="@Model.Start.ToString("yyyy-MM-dd")" />
+            </label>
+            <label>To
+                <input type="date" name="end" aria-describedby="@(Model.Id)-error" required min="@Model.Earliest.ToString("yyyy-MM-dd")" max="@Model.Latest.ToString("yyyy-MM-dd")" value="@Model.End.ToString("yyyy-MM-dd")" />
+            </label>
+        </div>
+        <p id="@(Model.Id)-error" class="admin-date-error" aria-live="polite" hidden></p>
+        <div class="admin-date-actions">
+            <button type="button" class="admin-date-cancel" popovertarget="@Model.Id" popovertargetaction="hide">Cancel</button>
+            <button type="submit" class="button button-primary">Apply dates</button>
+        </div>
+    </form>
+</div>

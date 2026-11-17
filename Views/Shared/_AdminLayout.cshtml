@@ -1,0 +1,128 @@
+@model AdminPage
+@{
+    var pageTitle = Model.Record?.Title ?? Model.Section.Title;
+}
+<!doctype html>
+<html lang="en" data-page="admin">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#1b1b1b" />
+    <meta name="robots" content="noindex" />
+    <title>@pageTitle · dcd. Admin</title>
+    <link rel="icon" type="image/svg+xml" href="~/favicon.svg" />
+    <link rel="stylesheet" href="~/assets/site.css" asp-append-version="true" />
+    <script src="~/js/appearance.js" asp-append-version="true"></script>
+    <script type="module" src="~/assets/admin.js" asp-append-version="true"></script>
+</head>
+<body class="admin-body">
+    <a class="skip-link" href="#admin-main">Skip to content</a>
+    <div class="admin-shell">
+        <aside id="admin-sidebar" class="admin-sidebar" aria-label="Sidebar">
+            <div class="admin-sidebar-header">
+                <a asp-controller="Admin" asp-action="Index" asp-route-sectionKey="dashboard" class="brand" aria-label="dcd. admin dashboard">dcd<span class="accent">.</span></a>
+                <button type="button" class="admin-sidebar-toggle" data-admin-collapse aria-controls="admin-navigation" aria-expanded="true" aria-label="Collapse sidebar" title="Collapse sidebar" hidden>
+                    <partial name="_AdminIcon" model='"sidebar"' />
+                </button>
+                <button type="button" class="admin-sidebar-toggle" aria-label="Close navigation" data-admin-close hidden>
+                    <partial name="_AdminIcon" model='"close"' />
+                </button>
+            </div>
+            <nav id="admin-navigation" class="admin-nav" aria-label="Admin">
+                @foreach (var group in AdminPreview.Sections.GroupBy(item => item.Group))
+                {
+                    <p class="admin-nav-group mono">@group.Key</p>
+                    <ul role="list" aria-label="@group.Key">
+                        @foreach (var item in group)
+                        {
+                            <li>
+                                <a asp-controller="Admin" asp-action="Index" asp-route-sectionKey="@item.Key"
+                                   aria-current="@(item == Model.Section ? "page" : null)" aria-label="@item.Title" title="@item.Title">
+                                    <partial name="_AdminIcon" model="item.Key" />
+                                    <span class="admin-nav-label">@item.Title</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                }
+            </nav>
+            <div class="admin-sidebar-footer">
+                <a asp-controller="Account" asp-action="SignIn" aria-label="Log out" title="Log out">
+                    <partial name="_AdminIcon" model='"logout"' /><span class="admin-nav-label">Log out</span>
+                </a>
+            </div>
+        </aside>
+        <div class="admin-backdrop" data-admin-backdrop aria-hidden="true"></div>
+        <div class="admin-workspace">
+            <header class="admin-topbar">
+                <div class="admin-topbar-group">
+                    <button type="button" class="admin-sidebar-toggle" data-admin-toggle aria-controls="admin-sidebar" aria-expanded="false" aria-label="Open navigation" hidden>
+                        <partial name="_AdminIcon" model='"sidebar"' />
+                    </button>
+                    <button type="button" class="admin-search-trigger" data-admin-search aria-label="Search admin pages" aria-haspopup="dialog" aria-keyshortcuts="Control+K Meta+K" hidden>
+                        <partial name="_AdminIcon" model='"search"' /><span>Search</span><kbd class="mono">Ctrl K</kbd>
+                    </button>
+                </div>
+                <div class="admin-topbar-group">
+                    <button type="button" class="circle-button admin-icon-button admin-theme-button" data-admin-theme aria-label="Switch theme" hidden>
+                        <span class="admin-sun"><partial name="_AdminIcon" model='"sun"' /></span>
+                        <span class="admin-moon"><partial name="_AdminIcon" model='"moon"' /></span>
+                    </button>
+                    <button type="button" class="circle-button admin-icon-button" data-admin-open="admin-profile" aria-label="Admin profile" aria-haspopup="dialog">
+                        <partial name="_AdminIcon" model='"users"' />
+                    </button>
+                    <a class="button admin-site-link" asp-controller="Home" asp-action="Index">Visit site <partial name="_Arrow" /></a>
+                </div>
+            </header>
+            <main id="admin-main" class="admin-main">
+                <header class="admin-page-heading">
+                    <div class="admin-page-title" data-record="@(Model.Record is not null ? "true" : null)">
+                        @if (Model.Record is not null)
+                        {
+                            <a class="circle-button admin-icon-button admin-back-button" asp-action="Index" asp-route-sectionKey="@Model.Section.Key" aria-label="Back to @Model.Section.Title" title="Back to @Model.Section.Title">
+                                <partial name="_AdminIcon" model='"arrow-left"' />
+                            </a>
+                        }
+                        <h1>@pageTitle</h1>
+                    </div>
+                    @if (IsSectionDefined("PageActions"))
+                    {
+                        @await RenderSectionAsync("PageActions")
+                    }
+                    else
+                    {
+                        @switch (Model.Section.Key)
+                        {
+                            case "dashboard":
+                            case "reports":
+                                <partial name="_AnalyticsFilters" model='Model.Section.Key == "reports"' />
+                                break;
+                            case "activity":
+                                var firstDate = DateOnly.FromDateTime(AdminPreview.Events.Min(item => item.OccurredAt));
+                                var lastDate = DateOnly.FromDateTime(AdminPreview.Events.Max(item => item.OccurredAt));
+                                <partial name="_AdminDatePicker" model='new AdminDatePicker("activity-dates", "All dates", firstDate, lastDate, firstDate, lastDate)' />
+                                break;
+                            case "home":
+                            case "about":
+                            case "contacts":
+                                <button class="button button-primary" type="submit" form="admin-page-form">Save changes <partial name="_AdminIcon" model='"arrow-up-right"' /></button>
+                                break;
+                            case "works":
+                            case "services":
+                            case "team":
+                                var entity = Model.Section.Key switch { "works" => "project", "services" => "service", _ => "team member" };
+                                <a class="button button-primary" asp-action="Record" asp-route-sectionKey="@Model.Section.Key" asp-route-recordKey="new">
+                                    <partial name="_AdminIcon" model='"plus"' /> Add @entity
+                                </a>
+                                break;
+                        }
+                    }
+                </header>
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+    <partial name="_AdminSearch" />
+    <partial name="_AdminRecordDialog" model='new AdminRecordDialog("admin-profile", "Admin profile", [new("Role", "Administrator")])' />
+</body>
+</html>

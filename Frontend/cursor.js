@@ -1,3 +1,27 @@
+export function createMagnet(gsap) {
+  let current
+
+  function release() {
+    if (!current) return
+    gsap.to(current, { x: 0, y: 0, duration: 0.45, ease: 'elastic.out(1, 0.4)', overwrite: 'auto' })
+    current = undefined
+  }
+
+  function move(target, x, y, strength = 1) {
+    if (target !== current) release()
+    current = target
+    if (!current) return
+    const rect = current.getBoundingClientRect()
+    gsap.to(current, {
+      x: (x - rect.left - rect.width / 2 + Number(gsap.getProperty(current, 'x'))) * 0.22 * strength,
+      y: (y - rect.top - rect.height / 2 + Number(gsap.getProperty(current, 'y'))) * 0.28 * strength,
+      duration: 0.3, ease: 'power3.out', overwrite: 'auto',
+    })
+  }
+
+  return { move, release }
+}
+
 export function attachCursor(gsap) {
   const root = document.documentElement
   const cursor = document.querySelector('.cursor')
@@ -21,14 +45,8 @@ export function attachCursor(gsap) {
   ]
   const events = new AbortController()
   const { signal } = events
-  let magnetic
+  const magnet = createMagnet(gsap)
   let layersMoving = false
-
-  function release() {
-    if (!magnetic) return
-    gsap.to(magnetic, { x: 0, y: 0, duration: 0.45, ease: 'elastic.out(1, 0.4)', overwrite: 'auto' })
-    magnetic = undefined
-  }
 
   function resetLayers() {
     if (!layersMoving) return
@@ -47,7 +65,7 @@ export function attachCursor(gsap) {
   function reset() {
     hideCrosshair()
     resetLayers()
-    release()
+    magnet.release()
   }
 
   window.addEventListener('pointermove', event => {
@@ -77,17 +95,7 @@ export function attachCursor(gsap) {
 
     const serviceIcon = event.target.closest('.service__tag')?.querySelector('.service__tile')
     const next = serviceIcon ?? event.target.closest('.button, .circle-button, .team-close, .work-card')
-    if (next !== magnetic) release()
-    magnetic = next
-    if (magnetic) {
-      const rect = magnetic.getBoundingClientRect()
-      const strength = magnetic.matches('.work-card') ? 0.22 : 1
-      gsap.to(magnetic, {
-        x: (x - rect.left - rect.width / 2 + Number(gsap.getProperty(magnetic, 'x'))) * 0.22 * strength,
-        y: (y - rect.top - rect.height / 2 + Number(gsap.getProperty(magnetic, 'y'))) * 0.28 * strength,
-        duration: 0.3, ease: 'power3.out', overwrite: 'auto',
-      })
-    }
+    magnet.move(next, x, y, next?.matches('.work-card') ? 0.22 : 1)
 
     root.classList.add('has-cursor')
     cursor.classList.add('is-visible')

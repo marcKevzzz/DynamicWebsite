@@ -1,0 +1,13 @@
+@model IEnumerable<AdminEvent>
+<ul class="admin-list" role="list">
+    @foreach (var item in Model)
+    {
+        <li class="admin-row">
+            <span class="admin-row-icon"><partial name="_AdminIcon" model="item.Icon" /></span>
+            <div class="admin-row-copy"><strong>@item.Action</strong><span>@item.Subject · @item.Actor</span></div>
+            <time class="admin-row-time" datetime="@item.OccurredAt.ToString("yyyy-MM-ddTHH:mm:ss")">
+                <span>@item.OccurredAt.ToString("MMM d")</span><span>@item.OccurredAt.ToString("h:mm tt")</span>
+            </time>
+        </li>
+    }
+</ul>

@@ -1,0 +1,18 @@
+<dialog class="shortcut-dialog admin-search-dialog" aria-label="Search admin pages">
+    <div class="command-search">
+        <partial name="_AdminIcon" model='"search"' />
+        <input aria-label="Search admin pages" placeholder="Search admin pages…" autocomplete="off"
+               role="combobox" aria-expanded="true" aria-autocomplete="list" aria-controls="admin-search-results" autofocus />
+        <button type="button" class="mono" data-close-menu aria-label="Close search">Esc</button>
+    </div>
+    <div id="admin-search-results" role="listbox" aria-label="Admin pages">
+        @foreach (var item in AdminPreview.Sections)
+        {
+            <button type="button" role="option" id="admin-search-@item.Key" data-url="@Url.Action("Index", "Admin", new { sectionKey = item.Key })" tabindex="-1">
+                <partial name="_AdminIcon" model="item.Key" /><span>@item.Title</span><small class="mono">@item.Group</small>
+            </button>
+        }
+    </div>
+    <p class="empty-results" role="status" hidden>No matching pages.</p>
+    <div class="command-footer mono"><span>↑ ↓ Navigate</span><span>Enter to open</span></div>
+</dialog>

@@ -1,0 +1,20 @@
+@model bool
+<div class="admin-analytics-filters" data-analytics-filters>
+    @if (Model)
+    {
+        <div class="admin-analytics-periods" role="group" aria-label="Report period">
+            <button type="button" class="admin-date-toggle" data-analytics-period="today" aria-pressed="false">Today</button>
+            <partial name="_AdminDatePicker" model='new AdminDatePicker("report-date-range", "Date range", AdminAnalytics.FirstDay, AdminAnalytics.LastDay, AdminAnalytics.FirstDay, AdminAnalytics.LastDay)' />
+        </div>
+    }
+    else
+    {
+        <div class="admin-segmented" role="group" aria-label="Dashboard period" data-admin-segmented data-active-index="2">
+            <span class="admin-segment-hover" aria-hidden="true"></span>
+            <span class="admin-segment-active" aria-hidden="true"></span>
+            <button type="button" data-analytics-period="today" aria-pressed="false">Today</button>
+            <button type="button" data-analytics-period="weekly" aria-pressed="false">Weekly</button>
+            <button type="button" data-analytics-period="monthly" aria-pressed="true">Monthly</button>
+        </div>
+    }
+</div>

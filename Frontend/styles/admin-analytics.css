@@ -1,0 +1,135 @@
+.admin-analytics-filters { margin-left: auto; }
+.admin-analytics-periods { display: flex; flex-wrap: wrap; align-items: center; justify-content: end; gap: 8px; }
+
+.admin-segmented {
+  --active-index: 2;
+  --hover-index: var(--active-index);
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+}
+.admin-segmented[data-active-index="0"] { --active-index: 0; }
+.admin-segmented[data-active-index="1"] { --active-index: 1; }
+.admin-segmented[data-hover-index="0"] { --hover-index: 0; }
+.admin-segmented[data-hover-index="1"] { --hover-index: 1; }
+.admin-segmented[data-hover-index="2"] { --hover-index: 2; }
+.admin-segmented button { z-index: 1; min-height: 40px; padding: 0 13px; border-radius: 999px; color: var(--muted); font-size: 13px; font-weight: 520; transition: color 180ms; }
+.admin-segmented button:hover { color: var(--fg); }
+.admin-segmented button[aria-pressed="true"] { color: var(--fg); }
+.admin-segmented button:focus-visible { outline-offset: -3px; }
+.admin-segment-hover, .admin-segment-active {
+  position: absolute;
+  inset: 3px auto 3px 3px;
+  width: calc((100% - 6px) / 3);
+  border-radius: 999px;
+  pointer-events: none;
+  transition: transform 280ms var(--admin-ease), opacity 180ms;
+}
+.admin-segment-hover { transform: translateX(calc(100% * var(--hover-index))); background: var(--admin-hover); opacity: 0; }
+.admin-segmented[data-hover-index] .admin-segment-hover { opacity: 1; }
+.admin-segment-active { transform: translateX(calc(100% * var(--active-index))); border: 1px solid var(--blue-line); background: var(--blue-line); }
+
+.admin-date-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 7px 13px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--fg);
+  font-size: 13px;
+  font-weight: 520;
+  transition: background-color 160ms, border-color 160ms;
+}
+.admin-date-toggle svg { width: 16px; height: 16px; }
+.admin-date-toggle:is(:hover, [aria-pressed="true"]) { border-color: var(--accent); background: var(--blue-line); }
+.admin-date-popover {
+  position: fixed;
+  inset: var(--date-top, 88px) auto auto var(--date-left, 14px);
+  width: min(320px, calc(100vw - 28px));
+  max-height: calc(100dvh - var(--date-top, 88px) - 14px);
+  margin: 0;
+  padding: 16px;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--admin-radius);
+  background: var(--panel);
+  color: var(--fg);
+  box-shadow: 0 12px 28px #0002;
+}
+.admin-date-title { margin: 0 0 14px; font-size: 15px; font-weight: 570; }
+.admin-date-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.admin-date-fields label { display: grid; gap: 5px; min-width: 0; padding-inline: 1px; color: var(--muted); font-size: 12px; }
+.admin-date-fields input {
+  width: 100%;
+  min-width: 0;
+  min-height: 42px;
+  padding: 4px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--fg);
+  font: inherit;
+}
+.admin-date-fields input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.admin-date-error { margin-block: 8px 0; color: var(--fg); font-size: 12px; }
+.admin-date-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: end; gap: 8px; margin-top: 16px; }
+.admin-date-actions .button, .admin-date-cancel { min-height: 40px; padding: 4px 10px; font-size: 12px; }
+.admin-date-cancel { color: var(--muted); }
+.admin-date-cancel:hover { color: var(--fg); }
+
+.admin-trend > [data-metric-direction]:not([hidden]) { display: flex; }
+.admin-bars { grid-template-columns: repeat(var(--plot-columns, 7), minmax(0, 1fr)); }
+.admin-bar { position: relative; min-width: 0; }
+.admin-bar:has([aria-pressed="true"]) { z-index: 1; }
+.admin-bar:focus-within, .admin-bar:hover { z-index: 2; }
+.admin-chart-point { position: relative; display: block; width: 100%; border-radius: 7px; color: inherit; outline-offset: 1px; }
+.admin-chart-point:focus-visible { outline-offset: 1px; }
+.admin-bar-fill { height: max(2px, calc(var(--bar-count) * 100% / var(--plot-maximum, 32))); transition: background-color 170ms, opacity 170ms; }
+.admin-chart-point:is(:hover, :focus-visible, [aria-pressed="true"]) .admin-bar-fill { background: var(--accent); }
+.admin-bars:has(.admin-chart-point:is(:hover, :focus-visible)) .admin-chart-point:not(:is(:hover, :focus-visible)) .admin-bar-fill { opacity: .65; }
+.admin-chart-tooltip {
+  position: absolute;
+  z-index: 1;
+  top: clamp(4px, calc(var(--admin-plot-height) * (1 - var(--bar-count) / var(--plot-maximum, 32)) - 47px), calc(var(--admin-plot-height) - 47px));
+  left: 50%;
+  display: grid;
+  width: max-content;
+  max-width: 144px;
+  gap: 2px;
+  padding: 6px 9px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--bg);
+  color: var(--muted);
+  font-size: 10px;
+  text-align: left;
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  transform: translate(-50%, 3px);
+  transition: opacity 170ms, transform 170ms;
+}
+.admin-chart-tooltip strong { color: var(--fg); font-size: 12px; }
+.admin-chart-point:is(:hover, :focus-visible, [aria-pressed="true"]) .admin-chart-tooltip { visibility: visible; opacity: 1; transform: translate(-50%, 0); }
+.admin-bar:first-child .admin-chart-tooltip { left: 0; transform: none; }
+.admin-bar:last-child:not(:only-child) .admin-chart-tooltip { right: 0; left: auto; transform: none; }
+
+@media (max-width: 540px) {
+  .admin-analytics-filters { margin-left: 0; }
+  .admin-segmented button { padding-inline: 10px; }
+  .admin-bar-label { font-size: 9px; }
+  .admin-bar:nth-child(2) .admin-chart-tooltip { left: 0; transform: none; }
+  .admin-bar:nth-last-child(2):not(:first-child) .admin-chart-tooltip { right: 0; left: auto; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .admin-segmented button, .admin-segment-hover, .admin-segment-active, .admin-date-toggle,
+  .admin-bar-fill, .admin-chart-tooltip { transition: none; }
+}
