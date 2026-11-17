@@ -4,81 +4,30 @@ import './site.css'
 import gsap from 'gsap'
 import { attachTheme } from './theme.js'
 import { attachCursor } from './cursor.js'
+import { attachToasts } from './toasts.js'
 
 attachTheme()
 const form = document.querySelector('[data-account-form]')
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)')
 
-const notifications = document.querySelector('.account-toasts')
-const announcer = document.querySelector('.account-toast-announcer')
-const stackToggle = document.createElement('button')
-stackToggle.type = 'button'
-stackToggle.className = 'account-toast-toggle'
-stackToggle.setAttribute('aria-expanded', 'false')
-notifications.append(stackToggle)
-
-function arrangeToasts() {
-  const toasts = [...notifications.querySelectorAll('.account-toast')]
-  notifications.hidden = !toasts.length
-  let height = 0
-  toasts.forEach((toast, index) => {
-    toast.style.setProperty('--stack-top', `${Math.min(index, 2) * 8}px`)
-    toast.style.setProperty('--stack-scale', 1 - Math.min(index, 2) * .04)
-    toast.style.setProperty('--expanded-top', `${height}px`)
-    toast.style.zIndex = toasts.length - index
-    height += toast.offsetHeight + 8
-  })
-  const multiple = toasts.length > 1
-  notifications.style.setProperty('--stack-height', `${(toasts[0]?.offsetHeight || 0) + (multiple ? 52 : 0)}px`)
-  notifications.style.setProperty('--expanded-height', `${height + (multiple ? 28 : 0)}px`)
-  stackToggle.hidden = !multiple
-  stackToggle.textContent = notifications.dataset.expanded === 'true' ? 'Collapse ↑' : `+${toasts.length - 1} ↓`
-}
-stackToggle.addEventListener('click', () => {
-  const expanded = notifications.dataset.expanded !== 'true'
-  notifications.dataset.expanded = String(expanded)
-  stackToggle.setAttribute('aria-expanded', String(expanded))
-  arrangeToasts()
-})
-const toastSizes = new ResizeObserver(arrangeToasts)
-function notify(title, message, kind = 'info') {
-  const toast = document.createElement('button')
-  toast.type = 'button'
-  toast.className = 'account-toast'
-  toast.dataset.kind = kind
-  toast.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/>${kind === 'error' ? '<path d="M12 7v6m0 3v1"/>' : kind === 'success' ? '<path d="m7 12 3 3 7-7"/>' : '<path d="M12 11v6m0-10v1"/>'}</svg><span><strong></strong><small></small></span>`
-  toast.querySelector('strong').textContent = title
-  toast.querySelector('small').textContent = message
-  toast.setAttribute('aria-label', `${title}. ${message} Dismiss notification`)
-  function dismiss() {
-    clearTimeout(expiration)
-    const focused = document.activeElement === toast
-    toastSizes.unobserve(toast)
-    toast.remove()
-    arrangeToasts()
-    if (focused) (notifications.querySelector('.account-toast') || form?.querySelector('input:not([type="hidden"])') || close).focus({ preventScroll: true })
-  }
-  const expiration = setTimeout(dismiss, 5000)
-  toast.addEventListener('click', dismiss)
-  notifications.prepend(toast)
-  arrangeToasts()
-  toastSizes.observe(toast)
-  announcer.textContent = `${title}. ${message}`
-}
-
 const visual = document.querySelector('.account-visual')
 const imageShape = document.querySelector('#account-image-shape')
 const close = document.querySelector('.account-close')
+const notify = attachToasts(
+  document.querySelector('.account-toasts'),
+  document.querySelector('.account-toast-announcer'),
+  () => form?.querySelector('input:not([type="hidden"])') || close,
+)
 new ResizeObserver(([entry]) => {
   const { width, height } = entry.contentRect
   if (!width || !height) return
   const size = close.getBoundingClientRect().width
-  const notch = size + 24
-  const radius = size / 2
+  const notch = size + 36
+  const innerRadius = size / 2 + 16
   const edge = width - notch
   imageShape.setAttribute('clipPathUnits', 'userSpaceOnUse')
   imageShape.querySelector('path').setAttribute('d',
-    `M28 0H${edge - 28}Q${edge} 0 ${edge} 28V${notch - radius}Q${edge} ${notch} ${edge + radius} ${notch}H${width - 28}Q${width} ${notch} ${width} ${notch + 28}V${height - 28}Q${width} ${height} ${width - 28} ${height}H28Q0 ${height} 0 ${height - 28}V28Q0 0 28 0Z`)
+    `M28 0H${edge - 28}Q${edge} 0 ${edge} 28V${notch - innerRadius}Q${edge} ${notch} ${edge + innerRadius} ${notch}H${width - 28}Q${width} ${notch} ${width} ${notch + 28}V${height - 28}Q${width} ${height} ${width - 28} ${height}H28Q0 ${height} 0 ${height - 28}V28Q0 0 28 0Z`)
 }).observe(visual)
 
 if (form) {
@@ -218,7 +167,7 @@ if (form) {
 
 const media = gsap.matchMedia()
 media.add('(prefers-reduced-motion: no-preference)', () => {
-  gsap.from('.account-shell', { y: 20, opacity: 0, duration: .65, ease: 'power3.out' })
+  gsap.from('.account-shell', { opacity: 0, duration: .65, ease: 'power3.out' })
   gsap.from('.account-title, .account-description, .account-field, .account-recovery-link, .account-submit, .account-links', {
     y: 14, opacity: 0, duration: .55, stagger: .045, delay: .12, ease: 'power3.out',
   })

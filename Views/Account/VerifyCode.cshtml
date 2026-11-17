@@ -2,10 +2,11 @@
 @{
     Layout = "_AccountLayout";
     ViewData["Title"] = "Verification code";
+    ViewData["CloseToSignIn"] = true;
 }
 <h1 id="account-title" class="account-title account-title-single">Enter your code.</h1>
 <p class="account-description">Use the six-digit code from your recovery email to continue.</p>
-<form asp-action="VerifyCode" method="post" class="account-form" data-account-form>
+<form asp-action="VerifyCode" method="post" class="account-form account-form-recovery" data-account-form>
     <div asp-validation-summary="ModelOnly" class="account-status" role="alert"></div>
     <div class="account-field">
         <label asp-for="Code"></label>
@@ -18,5 +19,4 @@
 </form>
 <div class="account-links">
     <p>Need another code? <a asp-action="ForgotPassword">Start again</a></p>
-    <a asp-action="SignIn">Back to sign in</a>
 </div>

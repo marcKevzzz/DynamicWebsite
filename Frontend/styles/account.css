@@ -1,6 +1,6 @@
 .account-body {
   --account-error: #e89a96;
-  min-height: 100svh;
+  min-height: 100dvh;
   display: grid;
   place-items: center;
   padding: 0;
@@ -15,7 +15,7 @@
   grid-template-columns: minmax(0, .42fr) minmax(0, .58fr);
   gap: 0;
   width: 100%;
-  min-height: 100svh;
+  min-height: 100dvh;
   background: var(--bg);
 }
 .account-pane { min-width: 0; display: flex; flex-direction: column; padding: 48px clamp(36px, 6.5vw, 112px); justify-content: center; }
@@ -56,7 +56,7 @@
 .account-eye-slash { visibility: hidden; }
 .account-password-toggle[aria-pressed="true"] .account-eye-slash { visibility: visible; }
 .account-submit { width: 100%; min-height: 54px; margin-top: 4px; padding-inline: 22px; border-color: var(--fg); background: var(--fg); color: var(--bg); font-size: 14px; }
-.account-form-sign-up .account-submit {margin-top: 12px;}
+:is(.account-form-sign-up, .account-form-recovery) .account-submit { margin-top: 12px; }
 .account-submit:hover { border-color: var(--accent); background: var(--accent); color: var(--on-accent); }
 .account-submit:disabled { opacity: .65; cursor: wait; }
 .account-links { display: grid; justify-items: center; gap: 14px; margin-top: 28px; padding-inline: 0; font-size: 14px; text-align: center; }
@@ -68,13 +68,13 @@
 .account-status.validation-summary-errors { margin-bottom: 18px; padding: 12px 16px; border: 1px solid var(--account-error); border-radius: 14px; color: var(--account-error); font-size: 13px; line-height: 1.5; }
 .account-status ul { margin: 0; padding: 0; list-style: none; }
 .account-shape-definitions { position: absolute; }
-.account-visual { position: relative; min-width: 0; min-height: calc(100svh - 2 * var(--account-image-padding)); margin: var(--account-image-padding); overflow: hidden; clip-path: url(#account-image-shape); background: #272625; }
+.account-visual { position: sticky; top: var(--account-image-padding); align-self: start; min-width: 0; height: calc(100dvh - 2 * var(--account-image-padding)); margin: var(--account-image-padding); overflow: hidden; clip-path: url(#account-image-shape); background: #272625; }
 .account-visual > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .account-visual-copy { position: relative; z-index: 1; padding: clamp(32px, 4vw, 64px) 36px; color: #eeeee8; }
 .account-visual-copy p { font-size: clamp(46px, 5.1vw, 80px); font-weight: 500; line-height: .98; letter-spacing: -.06em; }
 .account-visual-copy span { color: #8797ff; }
 .account-visual-signature { position: absolute; z-index: 1; bottom: 28px; left: 36px; color: #eeeee8; font-size: 11px; line-height: 1.7; }
-.account-close { position: absolute; z-index: 2; top: calc(var(--account-image-padding) + 12px); right: calc(var(--account-image-padding) + 12px); width: var(--close-button-size); height: var(--close-button-size); border: 1px solid var(--line); background: var(--panel); color: var(--fg); }
+.account-close { position: fixed; z-index: 2; top: calc(var(--account-image-padding) + 12px); right: calc(var(--account-image-padding) + 12px); width: var(--close-button-size); height: var(--close-button-size); border: 1px solid var(--line); background: var(--panel); color: var(--fg); }
 .account-terms-copy { color: var(--muted); font-size: 16px; line-height: 1.6; }
 .account-terms-copy a { display: inline-block; margin-top: 20px; color: var(--accent); }
 @media (max-width: 950px) {
@@ -128,10 +128,11 @@
 .account-recovery-link a, .account-links a { text-underline-offset: 4px; }
 .account-recovery-link a { color: var(--muted); transition: color 220ms ease, text-decoration-color 220ms ease; }
 .account-code-entry { position: relative; }
+.account-field:has(.account-code-entry) > label { margin-left: 0; }
+.account-code-entry input { height: 68px; }
 .account-code-slots { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: clamp(5px, .6vw, 10px); }
-.account-code-slots input { height: 60px; padding: 0; border-radius: 14px; text-align: center; font-family: var(--font-mono); font-size: clamp(20px, 2vw, 28px); }
+.account-code-slots input { padding: 0; border-radius: 14px; text-align: center; font-family: var(--font-mono); font-size: clamp(20px, 2vw, 28px); }
 @media (max-width: 700px) {
-  .account-body, .account-shell { min-height: 100dvh; }
   .account-shell { grid-template-columns: minmax(0, 1fr); }
   .account-title:not(.account-title-single) { font-size: clamp(40px, 11vw, 58px); }
   .account-title-single { font-size: clamp(23px, 7.5vw, 40px); }
@@ -146,8 +147,9 @@
   .account-password-toggle { inset-block: 2px; }
   .account-submit { min-height: 44px; padding-block: 10px; }
   .account-links { margin-top: 20px; gap: 10px; font-size: 13px; }
-  .account-close { top: 20px; right: 23px; }
-  .account-code-slots input { height: 48px; padding: 0; font-size: 22px; }
+  .account-close { position: absolute; top: 20px; right: 23px; }
+  .account-code-entry input { height: 56px; }
+  .account-code-slots input { padding: 0; font-size: 22px; }
 }
 @media (max-width: 700px) and (max-height: 600px) {
   .account-pane { justify-content: flex-start; padding-block: 20px; }
