@@ -107,11 +107,10 @@
 [data-project="hole-in-hub"] { --project-background: #424244; --project-alternate-background: #fff; }
 [data-project="helmet-cartel"] { --project-background: #000; --project-alternate-background: #f4f5f7; }
 [data-project="schedsnap"] { --project-background: #f8f2e8; --project-alternate-background: #e9dcd0; }
-[data-project="dynamic-website"] { --project-background: #090b0f; --project-alternate-background: #090b0f; }
-[data-project="tower-of-hanoi"] { --project-background: #0e172b; }
+[data-project="cosmicgaze"] { --project-background: #080c19; }
+[data-project="signwise"] { --project-background: #142338; --project-alternate-background: #f3f0e9; }
 [data-project="programming-fundamentals"] { --project-background: #09090b; }
-[data-project="cpu-scheduling-calculator"] { --project-background: #f6fbff; --project-alternate-background: #fff; }
-:root[data-theme="light"] [data-project="tower-of-hanoi"] { --project-background: #eff6ff; }
+[data-project="pixelplaza"] { --project-background: #faf4e4; }
 :root[data-theme="light"] [data-project="programming-fundamentals"] { --project-background: #fff; }
 .work .work-theme-light { display: none; }
 :root[data-theme="light"] .work-theme-dark { display: none; }

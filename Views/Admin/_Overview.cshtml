@@ -1,12 +1,13 @@
-@model bool
+@model AdminPage
 @{
+    var reports = Model.Section.Key == "reports";
     var latestDay = AdminAnalytics.Days[^1];
     var previousMonth = AdminAnalytics.Days.Last(day => day.Date.Month != latestDay.Date.Month);
     var total = latestDay.Total;
     var inactive = latestDay.Inactive;
     var active = total - inactive;
     var activePercent = active * 100 / total;
-    var latest = Model ? total : AdminPreview.Signups[^1].Count;
+    var latest = reports ? total : AdminPreview.Signups[^1].Count;
     var previous = AdminPreview.Signups[^2].Count;
     var signupChange = (latest - previous) * 100 / previous;
     var inactiveChange = inactive - previousMonth.Inactive;
@@ -17,7 +18,13 @@
         (Label: "Total users", Value: total, Change: total - previousMonth.Total, Positive: true),
         (Label: "Active users", Value: active, Change: activeChange, Positive: true),
         (Label: "Inactive users", Value: inactive, Change: inactiveChange, Positive: true),
-        (Label: Model ? "Sign-ups" : "Monthly sign-ups", Value: latest, Change: signupChange, Positive: false)
+        (Label: reports ? "Sign-ups" : "Monthly sign-ups", Value: latest, Change: signupChange, Positive: false)
+    };
+    var content = new[]
+    {
+        (Label: "Projects", Count: Model.Portfolio.Projects.Length, Key: "works"),
+        (Label: "Services", Count: Model.Portfolio.Services.Length, Key: "services"),
+        (Label: "Team members", Count: Model.Portfolio.Team.Length, Key: "team")
     };
 }
 <script type="application/json" data-analytics-data>@Html.Raw(System.Text.Json.JsonSerializer.Serialize(AdminAnalytics.Days, System.Text.Json.JsonSerializerOptions.Web))</script>
@@ -32,12 +39,12 @@
             <dd>
                 <strong data-metric-value>@metric.Value</strong>
                 <span class="admin-metric-comparison">
-                    <span class="admin-trend" data-positive="@(!Model && metric.Positive ? "true" : "false")" data-metric-trend>
-                        <span data-metric-direction="up" hidden="@(Model || metric.Change <= 0)"><partial name="_AdminIcon" model='"trend-up"' /></span>
-                        <span data-metric-direction="down" hidden="@(Model || metric.Change >= 0)"><partial name="_AdminIcon" model='"trend-down"' /></span>
-                        <span data-metric-change>@(Model ? "—" : change)</span>
+                    <span class="admin-trend" data-positive="@(!reports && metric.Positive ? "true" : "false")" data-metric-trend>
+                        <span data-metric-direction="up" hidden="@(reports || metric.Change <= 0)"><partial name="_AdminIcon" model='"trend-up"' /></span>
+                        <span data-metric-direction="down" hidden="@(reports || metric.Change >= 0)"><partial name="_AdminIcon" model='"trend-down"' /></span>
+                        <span data-metric-change>@(reports ? "—" : change)</span>
                     </span>
-                    <span data-metric-comparison>@(Model ? "No earlier data" : "vs. last month")</span>
+                    <span data-metric-comparison>@(reports ? "No earlier data" : "vs. last month")</span>
                 </span>
             </dd>
         </div>
@@ -50,7 +57,7 @@
             <span class="admin-period"><partial name="_AdminIcon" model='"calendar"' /> <span data-analytics-range>@range</span></span>
         </header>
         <div class="admin-chart">
-            <div class="admin-chart-scale mono" aria-hidden="true"><span>32</span><span>24</span><span>16</span><span>8</span><span>0</span></div>
+            <div class="admin-chart-scale mono" aria-hidden="true"><span>40</span><span>32</span><span>24</span><span>16</span><span>8</span><span>0</span></div>
             <ul class="admin-bars" role="list" aria-label="Sign-ups by period" style="--plot-columns: @AdminPreview.Signups.Count">
                 @for (var monthIndex = 0; monthIndex < AdminPreview.Signups.Count; monthIndex++)
                 {
@@ -69,11 +76,30 @@
             </ul>
         </div>
     </section>
-    @if (Model)
+    @if (reports)
     {
-        <section class="admin-panel" aria-labelledby="account-status-title">
+        <section class="admin-panel admin-status-chart" aria-labelledby="account-status-title">
             <header class="admin-panel-header"><h2 id="account-status-title">Account status</h2></header>
-            <div class="admin-ring" style="--active-share: @activePercent%" aria-label="@activePercent percent active" role="img" data-analytics-ring><span>@activePercent%</span></div>
+            <div class="admin-ring" style="--active-share: @activePercent; --segment-gap: @(inactive > 0 && active > 0 ? 2 : 0)" data-analytics-ring>
+                <svg viewBox="0 0 144 144" role="group" aria-label="Account status chart">
+                    <defs>
+                        <mask id="ring-reveal" maskUnits="userSpaceOnUse" x="0" y="0" width="144" height="144">
+                            <circle class="admin-ring-reveal" cx="72" cy="72" r="53" pathLength="100" stroke="white" stroke-width="56" fill="none" />
+                        </mask>
+                        <filter id="ring-corners" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB">
+                            <feGaussianBlur stdDeviation="1.5" />
+                            <feComponentTransfer><feFuncA type="linear" slope="8" intercept="-3.5" /></feComponentTransfer>
+                        </filter>
+                    </defs>
+                    <g mask="url(#ring-reveal)" filter="url(#ring-corners)">
+                        <circle class="admin-ring-active" cx="72" cy="72" r="53" pathLength="100" tabindex="0"
+                                role="img" aria-label="@active active accounts" data-ring-segment="active" />
+                        <circle class="admin-ring-inactive" cx="72" cy="72" r="53" pathLength="100" tabindex="0"
+                                role="img" aria-label="@inactive inactive accounts" data-ring-segment="inactive" />
+                    </g>
+                </svg>
+                <div class="admin-ring-center" aria-hidden="true"><strong data-ring-value>@activePercent%</strong><span data-ring-label>Active</span></div>
+            </div>
             <dl class="admin-breakdown">
                 <div><dt>Active</dt><dd data-analytics-active>@active</dd></div>
                 <div><dt>Inactive</dt><dd data-analytics-inactive>@inactive</dd></div>
@@ -83,21 +109,32 @@
     else
     {
         <section class="admin-panel admin-activity-panel" aria-labelledby="recent-activity-title">
-            <header class="admin-panel-header"><h2 id="recent-activity-title">Recent activity</h2></header>
-            <partial name="_Activity" model="AdminPreview.Events.Take(4)" />
-            <a class="admin-inline-link" asp-controller="Admin" asp-action="Index" asp-route-sectionKey="activity">Activity <partial name="_Arrow" /></a>
+            <header class="admin-panel-header">
+                <h2 id="recent-activity-title">Recent activity</h2>
+                <a class="admin-stat-arrow" asp-controller="Admin" asp-action="Index" asp-route-sectionKey="activity" aria-label="View all activity"><partial name="_AdminIcon" model='"arrow-up-right"' /></a>
+            </header>
+            <partial name="_Activity" model="AdminPreview.Events.OrderByDescending(item => item.OccurredAt).Take(10)" />
         </section>
     }
 </div>
-@if (!Model)
-{
-    <section class="admin-panel admin-content-panel" aria-labelledby="admin-content-title">
-        <header class="admin-panel-header"><h2 id="admin-content-title">Website content</h2></header>
-        <ul class="admin-content-links" role="list">
-            @foreach (var item in AdminPreview.Sections.Where(item => item.Group == "Website"))
+<div class="@(reports ? null : "admin-overview")">
+        <ul class="admin-content-stats" role="list" aria-label="Content counts">
+            @foreach (var item in content)
             {
-                <li><a asp-controller="Admin" asp-action="Index" asp-route-sectionKey="@item.Key"><partial name="_AdminIcon" model="item.Key" /><span>@item.Title</span><partial name="_Arrow" /></a></li>
+                <li>
+                    <a asp-controller="Admin" asp-action="Index" asp-route-sectionKey="@item.Key">
+                        <span>@item.Label</span>
+                        <span class="admin-stat-arrow"><partial name="_AdminIcon" model='"arrow-up-right"' /></span>
+                        <strong data-content-count>@item.Count</strong>
+                    </a>
+                </li>
             }
         </ul>
-    </section>
-}
+    @if (!reports)
+    {
+        <section class="admin-panel admin-preview-status" aria-labelledby="preview-status-title">
+            <h2 id="preview-status-title">Preview status</h2>
+            <span class="admin-status" data-active="true">Available</span>
+        </section>
+    }
+</div>

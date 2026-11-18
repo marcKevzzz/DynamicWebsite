@@ -5,7 +5,7 @@
 }
 <h1 id="account-title" class="account-title account-title-single">Welcome back.</h1>
 <p class="account-description">Sign in to explore our latest projects and the people behind them.</p>
-<form asp-action="SignIn" method="post" class="account-form" data-account-form>
+<form asp-action="SignIn" asp-route-returnUrl="@Context.Request.Query["ReturnUrl"]" method="post" class="account-form" data-account-form data-sign-in data-logged-out="@(TempData["AdminLoggedOut"] as bool? == true ? "true" : null)">
     <div asp-validation-summary="ModelOnly" class="account-status" role="alert"></div>
     <div class="account-field">
         <label asp-for="Email"></label>

@@ -1,23 +1,51 @@
 using Dcd.Web.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authentication;
+using System.Security.Claims;
+using System.Security.Cryptography;
 
 namespace Dcd.Web.Controllers;
 
-public sealed class AccountController : Controller
+public sealed class AccountController(IConfiguration configuration) : Controller
 {
     [HttpGet("/account/sign-in")]
     public IActionResult SignIn() => View(new SignInViewModel());
 
     [HttpPost("/account/sign-in")]
     [ValidateAntiForgeryToken]
-    public IActionResult SignIn(SignInViewModel model)
+    public async Task<IActionResult> SignIn(SignInViewModel model, string? returnUrl)
     {
         if (ModelState.IsValid)
-            ModelState.AddModelError("", "Sign-in is not available yet. Please try again later.");
+        {
+            var email = configuration["LocalAdmin:Email"];
+            var salt = configuration["LocalAdmin:Salt"];
+            var hash = configuration["LocalAdmin:PasswordHash"];
+            if (email is not null && salt is not null && hash is not null &&
+                string.Equals(model.Email.Trim(), email, StringComparison.OrdinalIgnoreCase) &&
+                CryptographicOperations.FixedTimeEquals(Convert.FromBase64String(hash),
+                    Rfc2898DeriveBytes.Pbkdf2(model.Password, Convert.FromBase64String(salt), 210000, HashAlgorithmName.SHA256, 32)))
+            {
+                var identity = new ClaimsIdentity([new Claim(ClaimTypes.Name, email),
+                    new Claim(ClaimTypes.Role, "Administrator")], "AdminSession");
+                await HttpContext.SignInAsync("AdminSession", new ClaimsPrincipal(identity));
+                TempData["AdminSignedIn"] = true;
+                return Url.IsLocalUrl(returnUrl) ? LocalRedirect(returnUrl!) : RedirectToAction("Index", "Admin");
+            }
+            ModelState.AddModelError("", "The email or password is incorrect.");
+        }
 
         model.Password = "";
         ModelState.SetModelValue(nameof(model.Password), "", "");
         return View(model);
+    }
+
+    [HttpPost("/account/logout")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Logout()
+    {
+        await HttpContext.SignOutAsync("AdminSession");
+        TempData["AdminLoggedOut"] = true;
+        return RedirectToAction(nameof(SignIn));
     }
 
     [HttpGet("/account/sign-up")]

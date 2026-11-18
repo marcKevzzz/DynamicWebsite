@@ -15,7 +15,7 @@
     <script src="~/js/appearance.js" asp-append-version="true"></script>
     <script type="module" src="~/assets/admin.js" asp-append-version="true"></script>
 </head>
-<body class="admin-body">
+<body class="admin-body" data-signed-in="@(TempData["AdminSignedIn"] as bool? == true ? "true" : null)">
     <a class="skip-link" href="#admin-main">Skip to content</a>
     <div class="admin-shell">
         <aside id="admin-sidebar" class="admin-sidebar" aria-label="Sidebar">
@@ -47,9 +47,11 @@
                 }
             </nav>
             <div class="admin-sidebar-footer">
-                <a asp-controller="Account" asp-action="SignIn" aria-label="Log out" title="Log out">
+                <form asp-controller="Account" asp-action="Logout" method="post" data-admin-logout>
+                    <button type="submit" aria-label="Log out" title="Log out">
                     <partial name="_AdminIcon" model='"logout"' /><span class="admin-nav-label">Log out</span>
-                </a>
+                    </button>
+                </form>
             </div>
         </aside>
         <div class="admin-backdrop" data-admin-backdrop aria-hidden="true"></div>
@@ -65,8 +67,7 @@
                 </div>
                 <div class="admin-topbar-group">
                     <button type="button" class="circle-button admin-icon-button admin-theme-button" data-admin-theme aria-label="Switch theme" hidden>
-                        <span class="admin-sun"><partial name="_AdminIcon" model='"sun"' /></span>
-                        <span class="admin-moon"><partial name="_AdminIcon" model='"moon"' /></span>
+                        <partial name="_ThemeIcons" />
                     </button>
                     <button type="button" class="circle-button admin-icon-button" data-admin-open="admin-profile" aria-label="Admin profile" aria-haspopup="dialog">
                         <partial name="_AdminIcon" model='"users"' />
@@ -74,7 +75,7 @@
                     <a class="button admin-site-link" asp-controller="Home" asp-action="Index">Visit site <partial name="_Arrow" /></a>
                 </div>
             </header>
-            <main id="admin-main" class="admin-main">
+            <main id="admin-main" class="admin-main" data-section="@Model.Section.Key">
                 <header class="admin-page-heading">
                     <div class="admin-page-title" data-record="@(Model.Record is not null ? "true" : null)">
                         @if (Model.Record is not null)
@@ -123,6 +124,42 @@
         </div>
     </div>
     <partial name="_AdminSearch" />
-    <partial name="_AdminRecordDialog" model='new AdminRecordDialog("admin-profile", "Admin profile", [new("Role", "Administrator")])' />
+    <dialog class="shortcut-dialog admin-image-lightbox" aria-label="Image preview" data-admin-lightbox>
+        <button type="button" class="circle-button admin-icon-button" data-admin-dismiss aria-label="Close image preview" autofocus>
+            <partial name="_AdminIcon" model='"close"' />
+        </button>
+        <img alt="" />
+    </dialog>
+    <dialog id="admin-profile" class="shortcut-dialog admin-record-dialog" aria-labelledby="admin-profile-title" aria-describedby="admin-profile-description">
+        <header class="admin-panel-header"><h2 id="admin-profile-title">Admin profile</h2>
+            <button class="circle-button admin-icon-button" type="button" data-admin-dismiss aria-label="Close"><partial name="_AdminIcon" model='"close"' /></button>
+        </header>
+        <p id="admin-profile-description" class="admin-dialog-description">Update the name saved for this browser’s admin preview.</p>
+        <form data-admin-form>
+            <div class="admin-fields">
+                @foreach (var field in new[] { (Name: "firstName", Label: "First name", Auto: "given-name"), (Name: "lastName", Label: "Last name", Auto: "family-name") })
+                {
+                    <div class="admin-field">
+                        <label class="admin-field-label" for="profile-@field.Name">@field.Label <span aria-hidden="true">*</span></label>
+                        <input id="profile-@field.Name" class="admin-input" name="@field.Name" autocomplete="@field.Auto" maxlength="80" required data-admin-input data-label="@field.Label" aria-describedby="profile-@field.Name-error" />
+                        <p id="profile-@field.Name-error" class="admin-field-message" aria-live="polite"></p>
+                    </div>
+                }
+                <div class="admin-field"><span class="admin-field-label">Role</span><strong>Administrator</strong></div>
+            </div>
+            <footer class="admin-dialog-actions"><button type="submit" class="button button-primary">Save changes</button></footer>
+        </form>
+    </dialog>
+    <dialog id="admin-confirm" class="shortcut-dialog admin-record-dialog" aria-labelledby="admin-confirm-title" aria-describedby="admin-confirm-description">
+        <header class="admin-panel-header">
+            <h2 id="admin-confirm-title"></h2>
+            <button class="circle-button admin-icon-button" type="button" data-admin-dismiss aria-label="Close"><partial name="_AdminIcon" model='"close"' /></button>
+        </header>
+        <p class="admin-dialog-description" id="admin-confirm-description"></p>
+        <form method="dialog" class="admin-dialog-actions">
+            <button type="submit" class="button" value="cancel" autofocus>Cancel</button>
+            <button type="submit" class="button button-primary" value="confirm"></button>
+        </form>
+    </dialog>
 </body>
 </html>

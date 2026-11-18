@@ -1,4 +1,5 @@
 import { attachToasts } from './toasts.js'
+import { confirmAdminAction } from './admin-confirm.js'
 
 const imageType = /^image\/(png|jpeg|webp|svg\+xml|gif|avif)$/i
 const imageExtension = /\.(png|jpe?g|webp|svg|gif|avif)$/i
@@ -8,12 +9,15 @@ function imagePreview(file, removable) {
   const row = document.createElement('li')
   row.className = 'admin-image-tile'
   const preview = document.createElement('img')
-  const url = URL.createObjectURL(file)
-  const release = () => URL.revokeObjectURL(url)
-  preview.addEventListener('load', release, { once: true })
-  preview.addEventListener('error', release, { once: true })
   preview.alt = ''
-  preview.src = url
+  preview.draggable = false
+  preview.src = URL.createObjectURL(file)
+  const open = document.createElement('button')
+  open.type = 'button'
+  open.className = 'admin-image-open'
+  open.dataset.adminImageOpen = ''
+  open.setAttribute('aria-label', `Preview ${file.name}`)
+  open.append(preview)
   const name = document.createElement('span')
   name.className = 'admin-image-name'
   name.textContent = file.name
@@ -24,52 +28,74 @@ function imagePreview(file, removable) {
   remove.dataset.adminRemoveImage = ''
   remove.setAttribute('aria-label', `Remove ${file.name}`)
   remove.innerHTML = '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg>'
-  row.append(preview, name)
+  row.append(open, name)
   if (removable) row.append(remove)
   return row
+}
+
+function removeImage(item) {
+  const source = item.querySelector('img').src
+  if (source.startsWith('blob:')) URL.revokeObjectURL(source)
+  item.remove()
 }
 
 function attachImageInput(input, refresh) {
   const field = input.closest('.admin-image-field')
   const list = field.querySelector('[data-admin-images]')
   const isLogo = field.dataset.imageStyle === 'logo'
+  const isStack = field.dataset.imageStyle === 'stack'
+  const usesPrimary = field.closest('.admin-fields').dataset.layout !== 'home'
 
   function arrangeStack() {
-    if (field.dataset.imageStyle !== 'stack') return
+    if (!isStack) return
     const cards = [...list.children]
     const center = (cards.length - 1) / 2
+    const spacing = cards.length < 4 ? 104 : 76
+    list.style.setProperty('--fan-reach', `${Math.max(0, center) * spacing + 62}px`)
     cards.forEach((card, index) => {
-      const position = (index - center) / Math.max(center, .5)
+      const position = (index - center) / Math.max(center, 2)
       const angle = position * Math.PI / 2
-      card.style.setProperty('--fan-offset-x', (90 + Math.cos(angle) * 48) + 'px')
-      card.style.setProperty('--fan-offset-y', (index - center) * 76 + 'px')
-      card.style.setProperty('--fan-angle', position * 8 + 'deg')
+      card.draggable = true
+      const name = card.querySelector('.admin-image-name').textContent
+      const opener = card.querySelector('[data-admin-image-open]')
+      card.dataset.imageOrder = String(index + 1)
+      opener.setAttribute('aria-keyshortcuts', 'Alt+ArrowUp Alt+ArrowDown')
+      opener.setAttribute('aria-label',
+        `Preview ${name}, image ${index + 1} of ${cards.length}${usesPrimary && index === 0 ? ', primary' : ''}`)
+      card.style.setProperty('--fan-offset-x', (110 + Math.cos(angle) * 68) + 'px')
+      card.style.setProperty('--fan-offset-y', (index - center) * spacing + 'px')
+      card.style.setProperty('--fan-angle', position * 14 + 'deg')
       card.style.setProperty('--fan-delay', index * 35 + 'ms')
     })
   }
 
   arrangeStack()
+  if (isStack) {
+    attachImageOrdering(list, arrangeStack)
+    const resumeFan = () => delete field.dataset.lightboxDismissed
+    field.addEventListener('pointerleave', resumeFan)
+    field.addEventListener('pointermove', resumeFan)
+    field.addEventListener('keydown', resumeFan)
+  }
   input.addEventListener('change', () => {
     const files = [...input.files]
     if (!files.length) return
     const valid = files.filter(file => file.type ? imageType.test(file.type) : imageExtension.test(file.name))
     input.setCustomValidity(valid.length === files.length ? '' : imageTypeError)
-    if (!input.multiple && valid.length) list.replaceChildren()
+    if (!input.multiple && valid.length) [...list.children].forEach(removeImage)
     list.append(...valid.map(file => imagePreview(file, !isLogo)))
     arrangeStack()
     input.value = ''
     refresh(true)
   })
 
-  list.addEventListener('click', event => {
+  list.addEventListener('click', async event => {
     const button = event.target.closest('[data-admin-remove-image]')
-    if (!button) {
-      if (field.dataset.imageStyle === 'stack') input.click()
-      return
-    }
+    if (!button) return
     const item = button.closest('li')
+    if (!await confirmAdminAction('Remove this image?', 'Remove image', 'This image will be removed from the current selection.', true)) return
     const next = item.nextElementSibling ?? item.previousElementSibling
-    item.remove()
+    removeImage(item)
     arrangeStack()
     input.setCustomValidity('')
     refresh()
@@ -77,11 +103,51 @@ function attachImageInput(input, refresh) {
     focusTarget.focus()
   })
 
-  field.querySelector('[data-admin-remove-logo]')?.addEventListener('click', () => {
-    list.replaceChildren()
+  field.querySelector('[data-admin-remove-logo]')?.addEventListener('click', async () => {
+    if (!await confirmAdminAction('Remove this image?', 'Remove image', 'This field will return to its empty state.', true)) return
+    [...list.children].forEach(removeImage)
     input.setCustomValidity('')
     refresh()
     input.focus()
+  })
+}
+
+function attachImageOrdering(list, arrangeStack) {
+  let dragged
+  function move(card, target) {
+    if (!target || card === target) return
+    const movingDown = Boolean(card.compareDocumentPosition(target) & Node.DOCUMENT_POSITION_FOLLOWING)
+    if (movingDown) target.after(card)
+    else target.before(card)
+    arrangeStack()
+    card.querySelector('[data-admin-image-open]').focus({ preventScroll: true })
+  }
+
+  list.addEventListener('dragstart', event => {
+    const card = event.target.closest('.admin-image-tile')
+    if (!card) return
+    dragged = card
+    event.dataTransfer.setData('text/plain', card.querySelector('.admin-image-name').textContent)
+    event.dataTransfer.effectAllowed = 'move'
+  })
+  list.addEventListener('dragover', event => {
+    if (!dragged || !event.target.closest('.admin-image-tile')) return
+    event.preventDefault()
+    event.dataTransfer.dropEffect = 'move'
+  })
+  list.addEventListener('drop', event => {
+    if (!dragged) return
+    event.preventDefault()
+    move(dragged, event.target.closest('.admin-image-tile'))
+    dragged = null
+  })
+  list.addEventListener('dragend', () => { dragged = null })
+  list.addEventListener('keydown', event => {
+    if (!event.altKey || !['ArrowUp', 'ArrowDown'].includes(event.key)) return
+    const card = event.target.closest('.admin-image-tile')
+    if (!card) return
+    event.preventDefault()
+    move(card, event.key === 'ArrowUp' ? card.previousElementSibling : card.nextElementSibling)
   })
 }
 
@@ -138,9 +204,10 @@ function attachChips(container, reducedMotion) {
     if (!event.isComposing && input.value.includes(',')) commit()
   })
   input.addEventListener('blur', commit)
-  container.addEventListener('click', event => {
+  container.addEventListener('click', async event => {
     const remove = event.target.closest('[data-remove-chip]')
     if (!remove || remove.disabled) return
+    if (!await confirmAdminAction(remove.getAttribute('aria-label') + '?', 'Remove', 'This item will be removed from the list.', true)) return
     input.focus()
     const chip = remove.closest('.admin-chip')
     if (reducedMotion.matches) {
@@ -153,7 +220,7 @@ function attachChips(container, reducedMotion) {
   return commit
 }
 
-export function attachAdminForms(gsap) {
+export function attachAdminForms(gsap, saveProfile) {
   const forms = [...document.querySelectorAll('[data-admin-form]:has([data-admin-input]:not([readonly]))')]
   if (!forms.length) return
 
@@ -167,7 +234,16 @@ export function attachAdminForms(gsap) {
   announcer.setAttribute('aria-atomic', 'true')
   document.body.append(announcer, notifications)
   const notify = attachToasts(notifications, announcer, origin => origin?.isConnected ? origin : null)
+  if (document.body.dataset.signedIn === 'true') notify('Signed in', 'Welcome to the admin dashboard.', 'success')
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)')
+  const owner = document.querySelector('[data-admin-owner]')
+  owner?.addEventListener('click', async () => {
+    if (owner.getAttribute('aria-disabled') === 'true') return
+    if (!await confirmAdminAction('Set this team member as owner?', 'Set as owner', 'This selects the owner for the current preview.')) return
+    owner.textContent = 'Owner'
+    owner.setAttribute('aria-disabled', 'true')
+    notify('Owner selected', 'Changes stay on this page.')
+  })
 
   for (const form of forms) {
     const inputs = [...form.querySelectorAll('[data-admin-input]:not([readonly])')]
@@ -197,7 +273,7 @@ export function attachAdminForms(gsap) {
       }
     }
 
-    form.addEventListener('submit', event => {
+    form.addEventListener('submit', async event => {
       event.preventDefault()
       for (const commit of commitChips) commit()
       const invalid = inputs.filter(input => !validate(input, true))
@@ -206,7 +282,12 @@ export function attachAdminForms(gsap) {
         notify('Check your changes', 'Correct the highlighted fields and try again.', 'error')
         return
       }
-      notify('Preview complete', 'Changes stay on this page.')
+      const action = event.submitter?.textContent.trim() || 'Save changes'
+      if (form.closest('#admin-profile')) {
+        if (await confirmAdminAction('Save profile changes?', action, 'Your updated name will be saved in this browser.')) saveProfile()
+      } else if (await confirmAdminAction(action + '?', action, 'Your edits apply to the current preview page.')) {
+        notify('Preview complete', 'Changes stay on this page.')
+      }
     })
   }
 }

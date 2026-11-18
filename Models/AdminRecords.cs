@@ -2,7 +2,8 @@ using System.Globalization;
 
 namespace Dcd.Web.Models;
 
-public sealed record AdminRecordPage(string Title, AdminField[] Fields, string? SaveLabel = null);
+public sealed record AdminRecordPage(string Title, AdminField[] Fields, string? SaveLabel = null,
+    bool? IsOwner = null, AdminUser? User = null, AdminEvent? Activity = null);
 
 public sealed record AdminRecordRow(
     string Key, string Title, string Subtitle, string Detail, string Metadata, AdminField[] Fields,
@@ -35,12 +36,16 @@ public static class AdminRecords
                 index < 1 || index > AdminPreview.Events.Count) return null;
 
             var item = AdminPreview.Events[index - 1];
-            return new(item.Action,
-            [
-                new("Record", item.Subject),
-                new("Actor", item.Actor),
-                new("Date and time", item.OccurredAt.ToString("MMM d, yyyy · h:mm tt"))
-            ]);
+            return new(item.Action, [], Activity: item);
+        }
+
+        if (sectionKey == "users")
+        {
+            if (!int.TryParse(recordKey, NumberStyles.None, CultureInfo.InvariantCulture, out var index) ||
+                index < 1 || index > AdminPreview.Users.Count || recordKey != index.ToString(CultureInfo.InvariantCulture)) return null;
+
+            var user = AdminPreview.Users[index - 1];
+            return new(user.Name, [], User: user);
         }
 
         var collection = Get(sectionKey, portfolio);
@@ -58,7 +63,9 @@ public static class AdminRecords
         }
 
         var row = collection.Rows.FirstOrDefault(row => string.Equals(row.Key, recordKey, StringComparison.OrdinalIgnoreCase));
-        return row is null ? null : new(row.Title, row.Fields, collection.Entity is null ? null : "Save changes");
+        if (row is null) return null;
+        bool? isOwner = sectionKey == "team" ? portfolio.Team.First(member => member.Id == row.Key).IsOwner is true : null;
+        return new(row.Title, row.Fields, collection.Entity is null ? null : "Save changes", isOwner);
     }
 
     private static AdminRecordRow ProjectRow(Project project)
@@ -79,7 +86,7 @@ public static class AdminRecords
             new("Category", project?.Category ?? "", Required: true),
             new("Technologies", string.Join(", ", project?.Stack ?? []), Type: "chips"),
             new("Website", project?.Url ?? "", Type: "url"),
-            new("Repository", project?.Github ?? "", Type: "url"),
+            new("Repository", project?.Github ?? "", Type: "url", Icon: "github", Wide: true),
             new("Description", string.Join("\n\n", project?.Details ?? []), Multiline: true, Required: true)
         ];
     }
@@ -100,22 +107,18 @@ public static class AdminRecords
 
     private static AdminField[] TeamFields(TeamMember? member) =>
         [
+            new("Portrait", "", Type: "image", Images: member is null ? [] : [$"portrait-{member.Id}.webp"], ImageStyle: "logo"),
             new("Display name", member?.Name ?? "", Required: true),
             new("Full name", member?.FullName ?? ""),
             new("Role", member?.Role ?? "", Required: true),
-            new("Owner", member?.IsOwner is true ? "Yes" : "No", Type: "switch"),
             new("Technologies", string.Join(", ", member?.Stack ?? []), Type: "chips"),
-            new("GitHub", member?.Github ?? "", Type: "url"),
+            new("GitHub", member?.Github ?? "", Type: "url", Icon: "github"),
             new("Public email", member?.Email ?? "", Type: "email"),
-            new("Bio", member?.Bio ?? "", Multiline: true, Required: true),
-            new("Portrait", "", Type: "image", Images: member is null ? [] : [$"portrait-{member.Id}.webp"], ImageStyle: "logo")
+            new("Bio", member?.Bio ?? "", Multiline: true, Required: true)
         ];
 
     private static AdminRecordRow UserRow(AdminUser user, int index) =>
         new((index + 1).ToString(CultureInfo.InvariantCulture), user.Name, user.Email,
             user.Active ? "Active" : "Inactive", user.Joined.ToString("MMM d, yyyy"),
-        [
-            new("Name", user.Name), new("Email", user.Email, Type: "email"),
-            new("Status", user.Active ? "Active" : "Inactive"), new("Joined", user.Joined.ToString("MMM d, yyyy"))
-        ], Initials: user.Initials, Active: user.Active);
+            [], Initials: user.Initials, Active: user.Active);
 }

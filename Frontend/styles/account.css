@@ -59,6 +59,17 @@
 :is(.account-form-sign-up, .account-form-recovery) .account-submit { margin-top: 12px; }
 .account-submit:hover { border-color: var(--accent); background: var(--accent); color: var(--on-accent); }
 .account-submit:disabled { opacity: .65; cursor: wait; }
+.account-form[aria-busy="true"] .account-submit svg { display: none; }
+.account-form[aria-busy="true"] .account-submit::after {
+  content: ''; width: 20px; height: 20px; border: 2px solid currentColor;
+  border-right-color: transparent; border-radius: 50%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .account-main { animation: account-enter 240ms ease-out; }
+  .account-form[aria-busy="true"] .account-submit::after { animation: account-spin 750ms linear infinite; }
+}
+@keyframes account-enter { from { opacity: .35; transform: translateY(5px); } }
+@keyframes account-spin { to { transform: rotate(1turn); } }
 .account-links { display: grid; justify-items: center; gap: 14px; margin-top: 28px; padding-inline: 0; font-size: 14px; text-align: center; }
 .account-links p { color: var(--muted); }
 .account-recovery-link a, .account-links a { color: var(--fg); text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 4px; transition: color 220ms ease, text-decoration-color 220ms ease; }

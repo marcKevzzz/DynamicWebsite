@@ -2,11 +2,12 @@ namespace Dcd.Web.Models;
 
 public sealed record AdminSection(string Key, string Title, string Group);
 public sealed record AdminPage(AdminSection Section, PortfolioPage Portfolio, AdminRecordPage? Record = null);
-public sealed record AdminUser(string Name, string Initials, string Email, bool Active, DateOnly Joined);
+public sealed record AdminUser(string Name, string Initials, string Email, bool Active, DateOnly Joined, string LastSignIn);
 public sealed record AdminEvent(string Action, string Subject, string Icon, string Actor, DateTime OccurredAt);
 public sealed record AdminSignupPeriod(string Label, int Count);
 public sealed record AdminField(string Label, string Value, bool Multiline = false, string Type = "text",
-    bool Required = false, string[]? Images = null, bool Multiple = false, string? Icon = null, string? ImageStyle = null);
+    bool Required = false, string[]? Images = null, bool Multiple = false, string? Icon = null, string? ImageStyle = null,
+    bool Wide = false);
 public sealed record AdminRecordDialog(string Id, string Title, AdminField[] Fields);
 public sealed record AdminForm(AdminField[] Fields, bool Editable, string? Layout = null);
 
@@ -17,18 +18,18 @@ public static class AdminPreview
         new("dashboard", "Dashboard", "Overview"),
         new("home", "Home", "Website"), new("about", "About", "Website"), new("works", "Works", "Website"),
         new("services", "Services", "Website"), new("team", "Team", "Website"), new("contacts", "Contacts", "Website"),
-        new("users", "Users", "Management"), new("reports", "Reports", "Management"),
-        new("activity", "Activity", "Management")
+        new("users", "Users", "Management"), new("activity", "Activity", "Management"),
+        new("reports", "Reports", "Management")
     ];
 
     public static IReadOnlyList<AdminUser> Users { get; } =
     [
-        new("Mira Reyes", "MR", "mira.reyes@example.com", true, new(2026, 11, 14)),
-        new("Noah Cruz", "NC", "noah.cruz@example.com", true, new(2026, 11, 11)),
-        new("Lena Santos", "LS", "lena.santos@example.com", false, new(2026, 11, 9)),
-        new("Eli Navarro", "EN", "eli.navarro@example.com", true, new(2026, 11, 5)),
-        new("Nina Torres", "NT", "nina.torres@example.com", true, new(2026, 10, 30)),
-        new("Ivo Flores", "IF", "ivo.flores@example.com", false, new(2026, 10, 26))
+        new("Mira Reyes", "MR", "mira.reyes@example.com", true, new(2026, 11, 14), "1 hour ago"),
+        new("Noah Cruz", "NC", "noah.cruz@example.com", true, new(2026, 11, 11), "3 hours ago"),
+        new("Lena Santos", "LS", "lena.santos@example.com", false, new(2026, 11, 9), "2 days ago"),
+        new("Eli Navarro", "EN", "eli.navarro@example.com", true, new(2026, 11, 5), "Yesterday"),
+        new("Nina Torres", "NT", "nina.torres@example.com", true, new(2026, 10, 30), "5 hours ago"),
+        new("Ivo Flores", "IF", "ivo.flores@example.com", false, new(2026, 10, 26), "1 week ago")
     ];
 
     public static IReadOnlyList<AdminEvent> Events { get; } =
@@ -39,7 +40,10 @@ public static class AdminPreview
         new("Service updated", "AI & automation workflows", "services", "Admin", new(2026, 11, 16, 11, 32, 0)),
         new("Team profile updated", "Chrstpr", "team", "Admin", new(2026, 11, 15, 11, 6, 0)),
         new("Contact details updated", "Studio email", "contacts", "Admin", new(2026, 11, 14, 9, 24, 0)),
-        new("User registered", "Mira Reyes", "users", "Mira Reyes", new(2026, 11, 14, 8, 50, 0))
+        new("User registered", "Mira Reyes", "users", "Mira Reyes", new(2026, 11, 14, 8, 50, 0)),
+        new("Home updated", "Collage images", "home", "Admin", new(2026, 11, 13, 14, 20, 0)),
+        new("Project updated", "SchedSnap", "works", "Admin", new(2026, 11, 12, 10, 15, 0)),
+        new("Contact details updated", "Studio email", "contacts", "Admin", new(2026, 11, 11, 16, 30, 0))
     ];
 
     public static IReadOnlyList<AdminSignupPeriod> Signups { get; } =
@@ -57,7 +61,7 @@ public static class AdminPreview
         new("Headline", "We Decide.\nWe Build.", true, Required: true),
         new("Supporting text", "Web and systems engineering for creative agencies and enterprises, from the first decision to deployment.", true, Required: true),
         new("Button label", "Meet the team", Required: true),
-        new("Button destination", "#team", Required: true)
+        new("Button destination", "#team", Required: true, Icon: "arrow-up-right")
     ];
 
     public static AdminField[] Company { get; } =

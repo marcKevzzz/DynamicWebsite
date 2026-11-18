@@ -9,7 +9,8 @@
         var id = $"{formId}-{index}";
         var messageId = $"{id}-message";
         var required = Model.Editable && field.Required;
-        <div class="admin-field" data-wide="@(field.Multiline || field.Type == "image" ? "true" : "false")">
+        var icon = field.Icon ?? (field.Type switch { "url" => "globe", "email" => "contacts", _ => null });
+        <div class="admin-field" data-wide="@(field.Wide || field.Multiline || field.Type == "image" ? "true" : "false")">
             <label class="admin-field-label" for="@(field.Type != "image" || Model.Editable ? id : null)">
                 @field.Label
                 @if (required)
@@ -26,7 +27,9 @@
                             var source = image.StartsWith("~/") ? image : image.StartsWith('/') ? $"~{image}" : $"~/images/{image}";
                             var name = System.IO.Path.GetFileName(image);
                             <li class="admin-image-tile">
-                                <img src="@Url.Content(source)" alt="" />
+                                <button type="button" class="admin-image-open" data-admin-image-open aria-label="Preview @name">
+                                    <img src="@Url.Content(source)" alt="" draggable="false" />
+                                </button>
                                 <span class="admin-image-name" title="@name">@name</span>
                                 @if (Model.Editable && field.ImageStyle != "logo")
                                 {
@@ -80,19 +83,12 @@
                     <input id="@id" type="text" data-chip-input placeholder="Add @field.Label.ToLowerInvariant()" autocomplete="off" />
                 </div>
             }
-            else if (field.Type == "switch")
-            {
-                <div class="admin-switch">
-                    <input id="@id" type="checkbox" role="switch" checked="@(field.Value == "Yes")" />
-                    <span aria-hidden="true"></span>
-                </div>
-            }
             else
             {
                 <div class="admin-input-control">
-                    @if (field.Icon is not null)
+                    @if (icon is not null)
                     {
-                        <span class="admin-input-icon"><partial name="_AdminIcon" model="field.Icon" /></span>
+                        <span class="admin-input-icon"><partial name="_AdminIcon" model="icon" /></span>
                     }
                     <input id="@id" class="admin-input" type="@field.Type" data-admin-input data-label="@field.Label"
                            readonly="@(!Model.Editable)" required="@required" value="@field.Value"

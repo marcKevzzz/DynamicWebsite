@@ -5,7 +5,6 @@
         .GroupBy(entry => DateOnly.FromDateTime(entry.Item.OccurredAt));
 }
 <div class="admin-panel admin-activity-list" data-activity-list>
-    <div class="admin-timeline-columns" aria-hidden="true"><span>Time</span><span>Activity</span><span>Actor</span><span></span></div>
     @foreach (var group in groups)
     {
         var dateKey = group.Key.ToString("yyyy-MM-dd");

@@ -18,6 +18,7 @@ const notify = attachToasts(
   document.querySelector('.account-toast-announcer'),
   () => form?.querySelector('input:not([type="hidden"])') || close,
 )
+if (form?.dataset.loggedOut === 'true') notify('Logged out', 'Your admin session has ended.', 'success')
 new ResizeObserver(([entry]) => {
   const { width, height } = entry.contentRect
   if (!width || !height) return
@@ -131,6 +132,10 @@ if (form) {
   }
 
   form.addEventListener('submit', event => {
+    if (form.getAttribute('aria-busy') === 'true') {
+      event.preventDefault()
+      return
+    }
     for (const input of inputs) {
       if (input.type !== 'password' && input.autocomplete !== 'new-password' && input.autocomplete !== 'current-password') input.value = input.value.trim()
     }
@@ -146,10 +151,14 @@ if (form) {
     form.setAttribute('aria-busy', 'true')
     form.querySelector('[type="submit"]').disabled = true
   })
+  window.addEventListener('pageshow', () => {
+    form.removeAttribute('aria-busy')
+    form.querySelector('[type="submit"]').disabled = false
+  })
 
   const summary = form.querySelector('.validation-summary-errors')
   if (summary) {
-    for (const error of summary.querySelectorAll('li')) notify('Unable to continue', error.textContent, 'error')
+    for (const error of summary.querySelectorAll('li')) notify(form.hasAttribute('data-sign-in') ? 'Unable to sign in' : 'Unable to continue', error.textContent, 'error')
     summary.hidden = true
   }
 
@@ -166,10 +175,4 @@ if (form) {
 }
 
 const media = gsap.matchMedia()
-media.add('(prefers-reduced-motion: no-preference)', () => {
-  gsap.from('.account-shell', { opacity: 0, duration: .65, ease: 'power3.out' })
-  gsap.from('.account-title, .account-description, .account-field, .account-recovery-link, .account-submit, .account-links', {
-    y: 14, opacity: 0, duration: .55, stagger: .045, delay: .12, ease: 'power3.out',
-  })
-})
 media.add('(pointer: fine) and (prefers-reduced-motion: no-preference)', () => attachCursor(gsap))

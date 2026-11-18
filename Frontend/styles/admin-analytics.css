@@ -1,4 +1,5 @@
-.admin-analytics-filters { margin-left: auto; }
+.admin-body { --analytics-stroke: clamp(12px, 2.4vw, 42px); }
+.admin-analytics-filters { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-left: auto; }
 .admin-analytics-periods { display: flex; flex-wrap: wrap; align-items: center; justify-content: end; gap: 8px; }
 
 .admin-segmented {
@@ -20,7 +21,7 @@
 .admin-segmented[data-hover-index="2"] { --hover-index: 2; }
 .admin-segmented button { z-index: 1; min-height: 40px; padding: 0 13px; border-radius: 999px; color: var(--muted); font-size: 13px; font-weight: 520; transition: color 180ms; }
 .admin-segmented button:hover { color: var(--fg); }
-.admin-segmented button[aria-pressed="true"] { color: var(--fg); }
+.admin-segmented button[aria-pressed="true"] { color: var(--on-accent); }
 .admin-segmented button:focus-visible { outline-offset: -3px; }
 .admin-segment-hover, .admin-segment-active {
   position: absolute;
@@ -32,7 +33,7 @@
 }
 .admin-segment-hover { transform: translateX(calc(100% * var(--hover-index))); background: var(--admin-hover); opacity: 0; }
 .admin-segmented[data-hover-index] .admin-segment-hover { opacity: 1; }
-.admin-segment-active { transform: translateX(calc(100% * var(--active-index))); border: 1px solid var(--blue-line); background: var(--blue-line); }
+.admin-segment-active { transform: translateX(calc(100% * var(--active-index))); background: var(--accent); }
 
 .admin-date-toggle {
   display: inline-flex;
@@ -92,13 +93,13 @@
 .admin-bar:focus-within, .admin-bar:hover { z-index: 2; }
 .admin-chart-point { position: relative; display: block; width: 100%; border-radius: 7px; color: inherit; outline-offset: 1px; }
 .admin-chart-point:focus-visible { outline-offset: 1px; }
-.admin-bar-fill { height: max(2px, calc(var(--bar-count) * 100% / var(--plot-maximum, 32))); transition: background-color 170ms, opacity 170ms; }
+.admin-bar-fill { height: max(2px, calc(var(--bar-count) * 100% / var(--plot-maximum))); transform-origin: bottom; transition: background-color 170ms, opacity 170ms; }
 .admin-chart-point:is(:hover, :focus-visible, [aria-pressed="true"]) .admin-bar-fill { background: var(--accent); }
 .admin-bars:has(.admin-chart-point:is(:hover, :focus-visible)) .admin-chart-point:not(:is(:hover, :focus-visible)) .admin-bar-fill { opacity: .65; }
 .admin-chart-tooltip {
   position: absolute;
   z-index: 1;
-  top: clamp(4px, calc(var(--admin-plot-height) * (1 - var(--bar-count) / var(--plot-maximum, 32)) - 47px), calc(var(--admin-plot-height) - 47px));
+  top: clamp(4px, calc(var(--admin-plot-height) * (1 - var(--bar-count) / var(--plot-maximum)) - 47px), calc(var(--admin-plot-height) - 47px));
   left: 50%;
   display: grid;
   width: max-content;
@@ -121,6 +122,40 @@
 .admin-chart-point:is(:hover, :focus-visible, [aria-pressed="true"]) .admin-chart-tooltip { visibility: visible; opacity: 1; transform: translate(-50%, 0); }
 .admin-bar:first-child .admin-chart-tooltip { left: 0; transform: none; }
 .admin-bar:last-child:not(:only-child) .admin-chart-tooltip { right: 0; left: auto; transform: none; }
+
+.admin-status-chart { --inactive-stroke: color-mix(in srgb, var(--accent) 38%, var(--panel)); display: grid; grid-template-rows: auto 1fr auto; }
+.admin-ring {
+  position: relative;
+  display: grid;
+  place-items: center;
+  container-type: size;
+  min-height: clamp(174px, 22vh, 210px);
+}
+.admin-ring svg { display: block; width: 100cqmin; height: 100cqmin; rotate: -90deg; }
+.admin-ring-reveal { stroke-dasharray: 100 100; }
+@media (prefers-reduced-motion: no-preference) {
+  .admin-ring-reveal { animation: admin-ring-draw 780ms var(--admin-ease) both; }
+}
+@keyframes admin-ring-draw { from { stroke-dashoffset: 100; } to { stroke-dashoffset: 0; } }
+.admin-ring [data-ring-segment] {
+  fill: none;
+  /* Convert the bar width into the 144-unit viewBox of the 252px donut. */
+  stroke-width: calc(var(--analytics-stroke) * 144 / 252);
+  stroke-dasharray: max(.01, calc(var(--share) - var(--segment-gap))) 100;
+  stroke-dashoffset: calc(0 - var(--offset) - var(--segment-gap) / 2);
+  transform-origin: center;
+  transition: stroke-dasharray 360ms var(--admin-ease), stroke-dashoffset 360ms var(--admin-ease), transform 180ms, opacity 180ms;
+}
+.admin-ring [data-empty="true"] { visibility: hidden; }
+.admin-ring-active { --share: var(--active-share); --offset: 0; stroke: var(--accent); }
+.admin-ring-inactive { --share: calc(100 - var(--active-share)); --offset: var(--active-share); stroke: var(--inactive-stroke); }
+.admin-ring [data-ring-segment]:focus { outline: none; }
+.admin-ring:has([data-ring-segment]:focus-visible) .admin-ring-center { outline: 2px solid var(--accent); outline-offset: 6px; border-radius: 6px; }
+.admin-ring [data-ring-segment]:is(:hover, :focus-visible) { transform: scale(1.045); }
+.admin-ring:has([data-ring-segment]:is(:hover, :focus-visible)) [data-ring-segment]:not(:is(:hover, :focus-visible)) { opacity: .65; }
+.admin-ring-center { position: absolute; display: grid; gap: 4px; text-align: center; pointer-events: none; }
+.admin-ring-center strong { font-size: 36px; font-weight: 530; line-height: 1; }
+.admin-ring-center span { color: var(--muted); font-size: 12px; }
 
 @media (max-width: 540px) {
   .admin-analytics-filters { margin-left: 0; }

@@ -8,9 +8,15 @@
 @section PageActions {
     @if (editable)
     {
-        <button class="button button-primary" type="submit" form="admin-page-form">
-            @record.SaveLabel <partial name="_AdminIcon" model='"arrow-up-right"' />
-        </button>
+        <div class="admin-record-actions">
+            @if (record.IsOwner is { } isOwner)
+            {
+                <button class="button" type="button" data-admin-owner aria-disabled="@(isOwner ? "true" : "false")">@(isOwner ? "Owner" : "Set as owner")</button>
+            }
+            <button class="button button-primary" type="submit" form="admin-page-form">
+                @record.SaveLabel <partial name="_AdminIcon" model='"arrow-up-right"' />
+            </button>
+        </div>
     }
 }
 
@@ -20,9 +26,33 @@
         <partial name="_Fields" model="new AdminForm(record.Fields, true, Model.Section.Key)" />
     </form>
 }
-else
+else if (record.User is { } user)
 {
-    <section class="admin-panel admin-single-panel" aria-label="@record.Title">
-        <partial name="_Fields" model="new AdminForm(record.Fields, false)" />
+    <section class="admin-panel admin-single-panel admin-detail-summary" aria-label="User details">
+        <span class="admin-row-icon admin-initials" aria-hidden="true">@user.Initials</span>
+        <div class="admin-detail-identity">
+            <div class="admin-detail-name">
+                <h2>@user.Name</h2>
+                <span class="admin-status" data-active="@(user.Active ? "true" : "false")">@(user.Active ? "Active" : "Inactive")</span>
+            </div>
+            <a href="mailto:@user.Email">@user.Email</a>
+        </div>
+        <dl class="admin-detail-meta">
+            <div><dt>Joined</dt><dd><time datetime="@user.Joined.ToString("yyyy-MM-dd")">@user.Joined.ToString("MMM d, yyyy")</time></dd></div>
+            <div><dt>Last sign-in (sample)</dt><dd>@user.LastSignIn</dd></div>
+        </dl>
+    </section>
+}
+else if (record.Activity is { } activity)
+{
+    <section class="admin-panel admin-single-panel admin-detail-summary" aria-label="Activity details">
+        <span class="admin-row-icon"><partial name="_AdminIcon" model="activity.Icon" /></span>
+        <div class="admin-detail-identity">
+            <h2>@activity.Subject</h2>
+            <p>By @activity.Actor</p>
+        </div>
+        <dl class="admin-detail-meta">
+            <div><dt>Occurred</dt><dd><time datetime="@activity.OccurredAt.ToString("s")">@activity.OccurredAt.ToString("MMM d, yyyy · h:mm tt")</time></dd></div>
+        </dl>
     </section>
 }

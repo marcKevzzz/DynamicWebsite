@@ -6,6 +6,7 @@
             <button type="button" class="admin-date-toggle" data-analytics-period="today" aria-pressed="false">Today</button>
             <partial name="_AdminDatePicker" model='new AdminDatePicker("report-date-range", "Date range", AdminAnalytics.FirstDay, AdminAnalytics.LastDay, AdminAnalytics.FirstDay, AdminAnalytics.LastDay)' />
         </div>
+        <a class="button" asp-controller="Admin" asp-action="ExportReport" data-report-export>Export CSV</a>
     }
     else
     {
