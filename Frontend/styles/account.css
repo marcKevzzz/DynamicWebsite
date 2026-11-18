@@ -78,8 +78,23 @@
 .account-status.validation-summary-valid { display: none; }
 .account-status.validation-summary-errors { margin-bottom: 18px; padding: 12px 16px; border: 1px solid var(--account-error); border-radius: 14px; color: var(--account-error); font-size: 13px; line-height: 1.5; }
 .account-status ul { margin: 0; padding: 0; list-style: none; }
-.account-visual { position: sticky; top: var(--account-image-padding); align-self: start; min-width: 0; height: calc(100dvh - 2 * var(--account-image-padding)); margin: var(--account-image-padding); overflow: hidden; border-radius: 28px; background: #272625; }
-.account-close-notch { position: absolute; z-index: 2; top: 0; right: 0; width: calc(var(--close-button-size) + 64px); aspect-ratio: 1; pointer-events: none; }
+.account-visual {
+  --notch-size: calc(var(--close-button-size) + 64px);
+  position: sticky;
+  top: var(--account-image-padding);
+  align-self: start;
+  min-width: 0;
+  height: calc(100dvh - 2 * var(--account-image-padding));
+  margin: var(--account-image-padding);
+  overflow: hidden;
+  border-radius: 28px 0 28px 28px;
+  background: #272625;
+  /* Clip the photo itself so its edge cannot bleed through a painted overlay. */
+  mask:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 118 118'%3E%3Cpath d='M0 0Q28 0 28 28V48Q28 90 70 90H90Q118 90 118 118H0Z'/%3E%3C/svg%3E") top right / var(--notch-size) var(--notch-size) no-repeat,
+    linear-gradient(black 0 0) left / calc(100% - var(--notch-size) + 1px) 100% no-repeat,
+    linear-gradient(black 0 0) bottom / 100% calc(100% - var(--notch-size) + 1px) no-repeat;
+}
 .account-visual > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .account-visual-copy { position: relative; z-index: 1; padding: clamp(32px, 4vw, 64px) 36px; color: #eeeee8; }
 .account-visual-copy p { font-size: clamp(46px, 5.1vw, 80px); font-weight: 500; line-height: .98; letter-spacing: -.06em; }
