@@ -11,6 +11,7 @@ import { attachCursor } from './cursor.js'
 import { attachProfiles } from './team.js'
 import { attachTheme } from './theme.js'
 import { attachCommands } from './commands.js'
+import { confirmAdminAction } from './admin-confirm.js'
 
 gsap.registerPlugin(ScrollTrigger)
 gsap.ticker.lagSmoothing(0)
@@ -26,10 +27,12 @@ let lenis
 const toggleTheme = attachTheme(theme)
 
 const mobileNav = header.querySelector('nav')
+const profileMenu = header.querySelector('.profile-menu')
 const menuToggle = header.querySelector('[data-mobile-nav]')
 const mobileHeader = matchMedia('(max-width: 700px)')
 
 function setMobileNav(open, restoreFocus = false) {
+  if (open) profileMenu.open = false
   header.classList.toggle('is-menu-open', open)
   menuToggle.setAttribute('aria-expanded', String(open))
   menuToggle.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation')
@@ -38,6 +41,12 @@ function setMobileNav(open, restoreFocus = false) {
 }
 
 header.classList.add('mobile-nav-ready')
+profileMenu.addEventListener('toggle', () => {
+  if (profileMenu.open) setMobileNav(false)
+})
+profileMenu.addEventListener('focusout', event => {
+  if (event.relatedTarget && !event.relatedTarget.closest('dialog') && !profileMenu.contains(event.relatedTarget)) profileMenu.open = false
+})
 menuToggle.hidden = false
 setMobileNav(false)
 mobileHeader.addEventListener('change', () => setMobileNav(false))
@@ -46,11 +55,17 @@ header.addEventListener('click', event => {
   if (mobileHeader.matches && event.target.closest('a')) setMobileNav(false, mobileNav.contains(event.target))
 })
 document.addEventListener('pointerdown', event => {
+  if (!event.target.closest('dialog') && !profileMenu.contains(event.target)) profileMenu.open = false
   if (header.classList.contains('is-menu-open') && !header.contains(event.target)) {
     setMobileNav(false, mobileNav.contains(document.activeElement))
   }
 })
 header.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && profileMenu.open) {
+    profileMenu.open = false
+    profileMenu.querySelector('summary').focus()
+    return
+  }
   if (event.key !== 'Escape' || !header.classList.contains('is-menu-open')) return
   event.preventDefault()
   setMobileNav(false, true)
@@ -70,7 +85,7 @@ updateRuler()
 
 const dialog = document.querySelector('.shortcut-dialog')
 attachCommands(dialog, {
-  canOpen: () => !document.querySelector(':is(.team-dialog, .project-dialog)[open]'),
+  canOpen: () => !document.querySelector(':is(.team-dialog, .project-dialog, #admin-confirm)[open]'),
   onOpen: () => lenis?.stop(),
   onClose: () => lenis?.start(),
   run(option) {
@@ -117,7 +132,7 @@ media.add('(min-width: 768px) and (prefers-reduced-motion: no-preference)', () =
     anchors: true,
     prevent: element => Boolean(element.closest('dialog')),
     virtualScroll: ({ event }) => {
-      if (!root.matches('.reload-locked, .opening')) return true
+      if (!root.classList.contains('opening')) return true
       if (event.cancelable && !event.ctrlKey) event.preventDefault()
       return false
     },
@@ -160,4 +175,14 @@ media.add('(pointer: fine) and (prefers-reduced-motion: no-preference)', () => a
 document.fonts.ready.then(() => {
   ScrollTrigger.refresh()
   updateRuler()
+})
+
+profileMenu.querySelector('form').addEventListener('submit', async event => {
+  event.preventDefault()
+  const form = event.currentTarget
+  if (await confirmAdminAction('Log out?', 'Log out', 'You’ll leave the portfolio and return to sign in.', true)) {
+    form.submit()
+  } else {
+    profileMenu.querySelector('summary').focus()
+  }
 })

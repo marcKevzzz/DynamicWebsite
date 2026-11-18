@@ -11,6 +11,7 @@
   transition: padding-top var(--nav-morph);
 }
 .header-bar {
+  position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
@@ -241,4 +242,50 @@
 @media (max-width: 700px) and (max-height: 480px) {
   .mobile-nav-ready nav { gap: 4px; padding-block: 12px; }
   .mobile-nav-ready nav .nav-link { min-height: 32px; font-size: 20px; }
+}
+.profile-menu { position: relative; }
+.profile-menu::details-content {
+  transition: content-visibility .7s allow-discrete;
+}
+.profile-menu summary { cursor: pointer; list-style: none; }
+.profile-menu summary::-webkit-details-marker { display: none; }
+.profile-menu-panel {
+  position: absolute;
+  top: calc(var(--nav-height) - 8px);
+  right: 0;
+  z-index: 2;
+  display: grid;
+  gap: 1.25rem;
+  width: min(15rem, calc(100vw - 24px));
+  padding: 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: var(--panel);
+  box-shadow: 0 20px 60px #0003;
+  opacity: 0;
+  transform: scale(.32);
+  transform-origin: 100% 0;
+  pointer-events: none;
+  transition: transform var(--nav-morph) .08s, opacity .18s ease .44s;
+}
+.profile-menu[open] .profile-menu-panel {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+  transition-delay: 0s;
+}
+@starting-style {
+  .profile-menu[open] .profile-menu-panel { opacity: 0; transform: scale(.32); }
+}
+.profile-menu-panel .nav-link {
+  justify-content: space-between;
+  min-height: 36px;
+  font-size: 16px;
+}
+.profile-menu-panel .nav-link svg { transition: color var(--nav-ease), transform var(--nav-ease); }
+.profile-menu-panel .nav-link:is(:hover, :focus-visible) svg { color: var(--accent); transform: translate(3px, -3px); }
+.profile-menu-panel .button { width: 100%; padding: 9px 16px; min-height: 0; justify-content: space-between; }
+@media (prefers-reduced-motion: reduce) {
+  .profile-menu::details-content, .profile-menu-panel { transition: none; }
+  .profile-menu-panel .nav-link:is(:hover, :focus-visible) svg { transition: none; transform: none; }
 }

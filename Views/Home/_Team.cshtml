@@ -8,7 +8,10 @@
             <li>
                 <a class="team-person" href="#@member.Id" aria-label="@member.Name" data-cursor="meet @member.Name ↗">
                     <span aria-hidden="true">@member.Name[..split]</span>
-                    <img src="/images/team-@(member.Id).webp" alt="" loading="lazy" decoding="async" />
+                    @if (member.Thumbnail is { } image)
+                    {
+                        <img src="@Url.Content("~/images/" + image)" alt="" loading="lazy" decoding="async" />
+                    }
                     <span aria-hidden="true">@member.Name[split..]</span>
                 </a>
             </li>
@@ -27,7 +30,10 @@
                         }
                     </h3>
                     <figure class="team-portrait">
-                        <img src="/images/portrait-@(member.Id).webp" alt="" loading="lazy" decoding="async" />
+                        @if (member.Portrait is { } image)
+                        {
+                            <img src="@Url.Content("~/images/" + image)" alt="" loading="lazy" decoding="async" />
+                        }
                     </figure>
                     <div class="team-profile-copy">
                         <div class="team-profile-identity">
@@ -87,7 +93,10 @@
                 @foreach (var member in Model)
                 {
                     <a href="#@member.Id" class="team-other" aria-label="@member.Name" data-cursor="meet @member.Name ↗">
-                        <img src="/images/team-@(member.Id).webp" alt="" loading="lazy" decoding="async" />
+                        @if (member.Thumbnail is { } image)
+                        {
+                            <img src="@Url.Content("~/images/" + image)" alt="" loading="lazy" decoding="async" />
+                        }
                         <span aria-hidden="true">@member.Name</span>
                     </a>
                 }

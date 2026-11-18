@@ -274,19 +274,10 @@
 .admin-dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 22px; }
 #admin-confirm { max-width: 420px; }
 .admin-dialog-description { color: var(--muted); font-size: 14px; line-height: 1.5; }
-#admin-profile .admin-dialog-description { margin-bottom: 22px; }
+#admin-profile [data-profile-status]:not(:empty) { margin-top: 16px; }
+#admin-profile .admin-field:last-child { grid-column: 1 / -1; overflow-wrap: anywhere; }
 #admin-confirm[data-destructive] [value="confirm"] { color: white; background: #ac3735; border-color: #ac3735; }
 #admin-confirm[data-destructive] [value="confirm"]:hover { background: #942e2c; }
-@media (prefers-reduced-motion: no-preference) {
-  .admin-record-dialog { opacity: 0; transform: translateY(6px); transition: opacity 160ms, transform 160ms, display 160ms allow-discrete, overlay 160ms allow-discrete; }
-  .admin-record-dialog[open] { opacity: 1; transform: none; }
-  .admin-record-dialog::backdrop { opacity: 0; transition: opacity 160ms, display 160ms allow-discrete, overlay 160ms allow-discrete; }
-  .admin-record-dialog[open]::backdrop { opacity: 1; }
-  @starting-style {
-    .admin-record-dialog[open], .admin-record-dialog[open]::backdrop { opacity: 0; }
-    .admin-record-dialog[open] { transform: translateY(6px); }
-  }
-}
 
 .admin-search-dialog { background: var(--panel); }
 .admin-search-dialog .command-search { gap: 10px; margin: 12px; padding: 4px 9px 4px 13px; border: 1px solid var(--line); border-radius: 99px; background: var(--bg); color: var(--muted); }

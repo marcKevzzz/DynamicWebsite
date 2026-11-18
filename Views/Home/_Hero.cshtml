@@ -1,33 +1,51 @@
+@model HeroContent
 <section class="hero" aria-labelledby="hero-title">
     <div class="hero-collage absolute inset-0 pointer-events-none" aria-hidden="true">
-        <figure class="hero-card hero-card-studio" data-enter data-depth="8">
-            <img src="~/images/hero-planning.webp" alt="" width="724" height="724" />
-            <figcaption class="hero-caption"><strong>Decide &amp; design</strong><span>Map the workflow before building.</span></figcaption>
-        </figure>
-        <figure class="hero-card hero-card-store" data-enter data-depth="12">
-            <img src="~/images/hero-hole-homepage.webp" alt="" width="810" height="900" fetchpriority="high" />
-        </figure>
-        <figure class="hero-card hero-card-desk" data-enter data-depth="10">
-            <img src="~/images/hero-coding.webp" alt="" width="724" height="724" />
-            <figcaption class="hero-caption"><strong>Code with intent</strong><span>Build the connections the system needs.</span></figcaption>
-        </figure>
-        <figure class="hero-card hero-card-dashboard" data-enter data-intro-rotation="0" data-depth="7">
-            <div class="hero-card-tilt"><img src="~/images/hero-schedsnap-homepage.webp" alt="" width="680" height="840" /></div>
-        </figure>
-        <figure class="hero-card hero-card-deploy" data-enter data-depth="14">
-            <img src="~/images/hero-monitoring.webp" alt="" width="724" height="724" />
-            <figcaption class="hero-caption"><strong>Deploy with care</strong><span>Get the whole system into production.</span></figcaption>
-        </figure>
+        @if (Model.Images.Length > 0)
+        {
+            <figure class="hero-card hero-card-studio" data-enter data-depth="8">
+                <img src="@Url.Content("~/images/" + Model.Images[0])" alt="" width="724" height="724" />
+                <figcaption class="hero-caption"><strong>Decide &amp; design</strong><span>Map the workflow before building.</span></figcaption>
+            </figure>
+        }
+        @if (Model.Images.Length > 1)
+        {
+            <figure class="hero-card hero-card-store" data-enter data-depth="12">
+                <img src="@Url.Content("~/images/" + Model.Images[1])" alt="" width="810" height="900" fetchpriority="high" />
+            </figure>
+        }
+        @if (Model.Images.Length > 2)
+        {
+            <figure class="hero-card hero-card-desk" data-enter data-depth="10">
+                <img src="@Url.Content("~/images/" + Model.Images[2])" alt="" width="724" height="724" />
+                <figcaption class="hero-caption"><strong>Code with intent</strong><span>Build the connections the system needs.</span></figcaption>
+            </figure>
+        }
+        @if (Model.Images.Length > 3)
+        {
+            <figure class="hero-card hero-card-dashboard" data-enter data-intro-rotation="0" data-depth="7">
+                <div class="hero-card-tilt"><img src="@Url.Content("~/images/" + Model.Images[3])" alt="" width="680" height="840" /></div>
+            </figure>
+        }
+        @if (Model.Images.Length > 4)
+        {
+            <figure class="hero-card hero-card-deploy" data-enter data-depth="14">
+                <img src="@Url.Content("~/images/" + Model.Images[4])" alt="" width="724" height="724" />
+                <figcaption class="hero-caption"><strong>Deploy with care</strong><span>Get the whole system into production.</span></figcaption>
+            </figure>
+        }
     </div>
 
     <div class="hero-copy absolute inset-0 grid place-content-center text-center">
         <h1 id="hero-title" class="hero-title">
-            <span><span data-hero-word>We Decide.</span></span>
-            <span><span data-hero-word>We Build.</span></span>
+            @foreach (var line in Model.Headline.Split('\n', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
+            {
+                <span><span data-hero-word>@line</span></span>
+            }
         </h1>
-        <p data-hero-detail class="hero-statement">Web and systems engineering for creative agencies and enterprises, from the first decision to deployment.</p>
+        <p data-hero-detail class="hero-statement">@Model.SupportingText</p>
     </div>
     <div class="hero-actions absolute flex justify-center" data-hero-detail>
-        <a href="#team" class="button button-primary">Meet the team <partial name="_Arrow" /></a>
+        <a href="@Model.Destination" class="button button-primary">@Model.ButtonLabel <partial name="_Arrow" /></a>
     </div>
 </section>

@@ -64,15 +64,6 @@ export function attachAdminDatePicker(picker, onApply) {
 function createPoints(days, period) {
   const first = days[0]
   const last = days.at(-1)
-  if (period === 'today') {
-    const labels = ['12a', '3a', '6a', '9a', '12p', '3p', '6p', '9p', '12a']
-    const slots = [3, 4, 5, 2, 6, 1, 7, 0]
-    const points = labels.slice(0, -1).map((label, index) => ({
-      label, detail: `${shortDate.format(utcDate(last.date))} · ${label}–${labels[index + 1]}`, count: 0,
-    }))
-    for (let index = 0; index < last.signups; index++) points[slots[index % slots.length]].count++
-    return points
-  }
   if (period === 'weekly' || days.length <= 7) {
     return days.map(day => ({
       label: days.length === 1 || period === 'weekly' ? weekday.format(utcDate(day.date)) : utcDate(day.date).getUTCDate(),
@@ -255,7 +246,7 @@ export function attachAdminAnalytics(gsap) {
     const plotDays = period === 'monthly' ? days : window
     const points = createPoints(plotDays, period)
     const intervals = scale.length - 1
-    const step = Math.max(8, Math.ceil(Math.max(...points.map(point => point.count)) / intervals))
+    const step = Math.max(1, Math.ceil(Math.max(...points.map(point => point.count)) / intervals))
     scale.forEach((label, index) => { label.textContent = step * (intervals - index) })
     bars.style.setProperty('--plot-columns', points.length)
     bars.style.setProperty('--plot-maximum', step * intervals)
@@ -282,14 +273,14 @@ export function attachAdminAnalytics(gsap) {
 
   const today = days.length - 1
   const monthStart = dayIndex.get(latest.date.slice(0, 7) + '-01')
-  const lastMonthStart = dayIndex.get(days[monthStart - 1].date.slice(0, 7) + '-01')
+  const lastMonthStart = monthStart > 0 ? dayIndex.get(days[monthStart - 1].date.slice(0, 7) + '-01') : -1
   periodButtons.forEach((button, index) => {
     button.addEventListener('click', () => {
       if (button.getAttribute('aria-pressed') === 'true') return
       const period = button.dataset.analyticsPeriod
       select(index)
       if (period === 'today') render(period, today, today, today - 1, today - 1, 'vs. yesterday')
-      if (period === 'weekly') render(period, today - 6, today, today - 13, today - 7, 'vs. last week')
+      if (period === 'weekly') render(period, Math.max(0, today - 6), today, today - 13, today - 7, 'vs. last week')
       if (period === 'monthly') render(period, monthStart, today, lastMonthStart, monthStart - 1, 'vs. last month')
     })
     button.addEventListener('pointerenter', () => {
@@ -297,6 +288,7 @@ export function attachAdminAnalytics(gsap) {
     })
   })
   segmented?.addEventListener('pointerleave', () => { delete segmented.dataset.hoverIndex })
+  segmented?.querySelector('[data-analytics-period="weekly"]').click()
   if (datePicker) {
     const setCaption = attachAdminDatePicker(datePicker, (start, end) => {
       const first = dayIndex.get(start)

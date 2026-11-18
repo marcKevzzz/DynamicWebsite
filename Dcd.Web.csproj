@@ -7,6 +7,10 @@
     <DefaultItemExcludes>$(DefaultItemExcludes);node_modules/**;dist/**;wwwroot/assets/**</DefaultItemExcludes>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.14" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.14" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.14" PrivateAssets="all" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.14" />
     <Watch Include="Frontend/**/*;package.json;package-lock.json;vite.config.mjs" />
   </ItemGroup>
   <Target Name="BuildFrontend" BeforeTargets="ResolveProjectStaticWebAssets" Condition="'$(DesignTimeBuild)' != 'true'">

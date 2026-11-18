@@ -5,6 +5,7 @@ import gsap from 'gsap'
 import { attachTheme } from './theme.js'
 import { attachCursor } from './cursor.js'
 import { attachToasts } from './toasts.js'
+import { confirmAdminAction } from './admin-confirm.js'
 
 attachTheme()
 const form = document.querySelector('[data-account-form]')
@@ -16,22 +17,21 @@ const notify = attachToasts(
   document.querySelector('.account-toast-announcer'),
   () => form?.querySelector('input:not([type="hidden"])') || close,
 )
-if (form?.dataset.loggedOut === 'true') notify('Logged out', 'Your admin session has ended.', 'success')
+if (form?.dataset.loggedOut === 'true') notify('Logged out', 'Your session has ended.', 'success')
+if (form?.dataset.notice) notify('Profile saved', form.dataset.notice, 'success')
 
 if (form) {
   form.noValidate = true
-  const inputs = [...form.querySelectorAll('input:not([type="hidden"])')]
+  const inputs = [...form.querySelectorAll('input:not([type="hidden"]):not([readonly])')]
 
   function shake(input) {
-    const target = input.closest('.account-code-entry') || input
-    if (!reducedMotion.matches) gsap.fromTo(target, { x: -4 }, { x: 0, duration: .4, ease: 'elastic.out(3, .25)', overwrite: 'auto' })
+    if (!reducedMotion.matches) gsap.fromTo(input, { x: -4 }, { x: 0, duration: .4, ease: 'elastic.out(3, .25)', overwrite: 'auto' })
   }
 
   function validate(input, feedback = false) {
     let message = ''
     if (!input.value.trim()) message = input.dataset.valRequired
     else if (input.validity.typeMismatch) message = input.dataset.valEmail
-    else if (input.dataset.valRegex && !new RegExp(input.dataset.valRegexPattern).test(input.value)) message = input.dataset.valRegex
     else if (input.minLength > 0 && input.value.length < input.minLength) message = input.dataset.valMinlength
     else if (input.value.length > input.maxLength) message = input.dataset.valLength
     else if (input.dataset.valEqualto && input.value !== form.elements.namedItem('Password').value) message = input.dataset.valEqualto
@@ -39,73 +39,8 @@ if (form) {
     output.textContent = message || ''
     input.setAttribute('aria-invalid', String(Boolean(message)))
     input.classList.toggle('input-validation-error', Boolean(message))
-    if (input === code) form.querySelectorAll('[data-code-digit]').forEach(digit => digit.setAttribute('aria-invalid', String(Boolean(message))))
     if (message && feedback) shake(input)
     return !message
-  }
-
-  const code = form.querySelector('[data-code-input]')
-  if (code) {
-    const slots = document.createElement('div')
-    slots.className = 'account-code-slots'
-    slots.setAttribute('role', 'group')
-    slots.setAttribute('aria-label', 'Six-digit verification code')
-    const digits = Array.from({ length: 6 }, (_, index) => {
-      const digit = document.createElement('input')
-      digit.id = `Code-digit-${index + 1}`
-      digit.type = 'text'
-      digit.inputMode = 'numeric'
-      digit.autocomplete = index === 0 ? 'one-time-code' : 'off'
-      digit.maxLength = 6
-      digit.dataset.codeDigit = ''
-      digit.setAttribute('aria-label', `Digit ${index + 1} of 6`)
-      digit.setAttribute('aria-describedby', 'Code-error')
-      digit.setAttribute('aria-invalid', String(code.classList.contains('input-validation-error')))
-      digit.value = code.value[index] || ''
-      slots.append(digit)
-      return digit
-    })
-    const syncCode = () => {
-      code.value = digits.map(digit => digit.value).join('')
-      if (code.getAttribute('aria-invalid') === 'true') validate(code)
-    }
-    const fillDigits = (value, index) => {
-      const numbers = value.replace(/[^0-9]/g, '').slice(0, 6)
-      if (numbers.length === 6) index = 0
-      for (let offset = 0; offset < numbers.length && index + offset < 6; offset++) digits[index + offset].value = numbers[offset]
-      digits[Math.min(index + numbers.length, 5)].focus()
-      syncCode()
-    }
-    digits.forEach((digit, index) => {
-      digit.addEventListener('focus', () => digit.select())
-      digit.addEventListener('input', () => {
-        const value = digit.value
-        digit.value = ''
-        if (value) fillDigits(value, index)
-        else syncCode()
-      })
-      digit.addEventListener('paste', event => {
-        event.preventDefault()
-        fillDigits(event.clipboardData.getData('text'), index)
-      })
-      digit.addEventListener('keydown', event => {
-        if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-          event.preventDefault()
-          digits[Math.max(0, Math.min(5, index + (event.key === 'ArrowLeft' ? -1 : 1)))].focus()
-        } else if (event.key === 'Backspace' && !digit.value && index > 0) {
-          event.preventDefault()
-          digits[index - 1].value = ''
-          digits[index - 1].focus()
-          syncCode()
-        }
-      })
-    })
-    slots.addEventListener('focusout', event => {
-      if (!slots.contains(event.relatedTarget)) validate(code, true)
-    })
-    code.type = 'hidden'
-    code.parentElement.append(slots)
-    form.querySelector('label[for="Code"]').htmlFor = digits[0].id
   }
 
   for (const input of inputs) {
@@ -118,7 +53,7 @@ if (form) {
     })
   }
 
-  form.addEventListener('submit', event => {
+  form.addEventListener('submit', async event => {
     if (form.getAttribute('aria-busy') === 'true') {
       event.preventDefault()
       return
@@ -130,10 +65,14 @@ if (form) {
     if (results.includes(false)) {
       event.preventDefault()
       const invalid = inputs[results.indexOf(false)]
-      const target = invalid === code ? form.querySelector('[data-code-digit]') : invalid
-      target.focus()
+      invalid.focus()
       notify('Check your details', 'Please correct the highlighted fields and try again.', 'error')
       return
+    }
+    if (form.hasAttribute('data-profile-save')) {
+      event.preventDefault()
+      if (!await confirmAdminAction('Save profile?', 'Save profile', 'Your account will use these names.')) return
+      form.submit()
     }
     form.setAttribute('aria-busy', 'true')
     form.querySelector('[type="submit"]').disabled = true

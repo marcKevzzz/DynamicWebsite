@@ -7,18 +7,7 @@
 <p class="account-description">Join dcd. and explore the people, projects, and ideas behind our work.</p>
 <form asp-action="SignUp" method="post" class="account-form account-form-sign-up" data-account-form>
     <div asp-validation-summary="ModelOnly" class="account-status" role="alert"></div>
-    <div class="account-name-fields">
-        <div class="account-field">
-            <label asp-for="FirstName"></label>
-            <input asp-for="FirstName" autocomplete="given-name" required maxlength="100" aria-describedby="FirstName-error" placeholder="First name" />
-            <span asp-validation-for="FirstName" id="FirstName-error" class="account-field-message" aria-live="polite"></span>
-        </div>
-        <div class="account-field">
-            <label asp-for="LastName"></label>
-            <input asp-for="LastName" autocomplete="family-name" required maxlength="100" aria-describedby="LastName-error" placeholder="Last name" />
-            <span asp-validation-for="LastName" id="LastName-error" class="account-field-message" aria-live="polite"></span>
-        </div>
-    </div>
+    <partial name="_Details" model="Model" />
     <div class="account-field">
         <label asp-for="Email"></label>
         <input asp-for="Email" type="email" autocomplete="email" inputmode="email" required maxlength="254" aria-describedby="Email-error" placeholder="you@example.com" />

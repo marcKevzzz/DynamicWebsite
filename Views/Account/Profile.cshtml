@@ -1,0 +1,18 @@
+@model ProfileViewModel
+@{
+    Layout = "_AccountLayout";
+    ViewData["Title"] = "Your profile";
+    var notice = TempData["AccountNotice"] as string;
+}
+<h1 id="account-title" class="account-title account-title-single">Your profile.</h1>
+@if (notice is not null) { <noscript><p role="status">@notice</p></noscript> }
+<form asp-action="Profile" method="post" class="account-form" data-account-form data-profile-save data-notice="@notice">
+    <div asp-validation-summary="ModelOnly" class="account-status" role="alert"></div>
+    <partial name="_Details" model="Model" />
+    <div class="account-field">
+        <label for="profile-email">Email</label>
+        <input id="profile-email" type="email" value="@Model.Email" readonly />
+    </div>
+    <button type="submit" class="button account-submit">Save profile <partial name="_Arrow" /></button>
+</form>
+<partial name="_ConfirmDialog" />

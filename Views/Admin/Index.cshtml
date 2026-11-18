@@ -11,13 +11,11 @@
     case "home":
     case "about":
     case "contacts":
-        var fields = Model.Section.Key switch
-        {
-            "home" => AdminPreview.Home,
-            "about" => AdminPreview.Company,
-            _ => AdminPreview.Contact
-        };
-        <form id="admin-page-form" class="admin-panel admin-single-panel" aria-label="@Model.Section.Title settings" data-admin-form>
+        var fields = Model.Portfolio.SettingsFields(Model.Section.Key);
+        <form asp-controller="AdminContent" asp-action="Save" asp-route-sectionKey="@Model.Section.Key" asp-route-recordKey="settings"
+              method="post" enctype="multipart/form-data" id="admin-page-form" class="admin-panel admin-single-panel" aria-label="@Model.Section.Title settings" data-admin-form>
+            <div asp-validation-summary="All" role="alert"></div>
+            <input type="hidden" name="Revision" value="@Model.Portfolio.Revisions[(Model.Section.Key, "settings")]" />
             <partial name="_Fields" model="new AdminForm(fields, true, Model.Section.Key)" />
         </form>
         break;
@@ -25,7 +23,7 @@
     case "services":
     case "team":
     case "users":
-        <partial name="_ContentList" model="AdminRecords.Get(Model.Section.Key, Model.Portfolio)" />
+        <partial name="_ContentList" model="AdminRecords.Get(Model.Section.Key, Model.Portfolio, Model.Users)" />
         break;
     case "activity":
         <partial name="_ActivityTimeline" />

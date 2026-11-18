@@ -1,0 +1,14 @@
+@model ConfirmEmailViewModel
+@{
+    Layout = "_AccountLayout";
+    ViewData["Title"] = "Confirm email";
+}
+<h1 id="account-title" class="account-title account-title-single">Confirm email.</h1>
+<p class="account-description">Use @Model.Email to sign in and recover this account.</p>
+<form asp-action="ConfirmEmail" method="post" class="account-form">
+    <div asp-validation-summary="All" class="account-status" role="alert"></div>
+    <input asp-for="Email" type="hidden" />
+    <input asp-for="Token" type="hidden" />
+    <button type="submit" class="button account-submit">Confirm email <partial name="_Arrow" /></button>
+</form>
+<div class="account-links"><a asp-action="Profile">Back to profile</a></div>

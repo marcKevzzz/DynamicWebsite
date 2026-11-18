@@ -1,5 +1,3 @@
-using System.Globalization;
-
 namespace Dcd.Web.Models;
 
 public sealed record AdminRecordPage(string Title, AdminField[] Fields, string? SaveLabel = null,
@@ -7,7 +5,7 @@ public sealed record AdminRecordPage(string Title, AdminField[] Fields, string? 
 
 public sealed record AdminRecordRow(
     string Key, string Title, string Subtitle, string Detail, string Metadata, AdminField[] Fields,
-    string? Image = null, string? Initials = null, bool? Active = null);
+    string? Image = null, string? Initials = null, bool? Active = null, bool CanChangeStatus = false);
 
 public sealed record AdminRecordList(
     string Key, string Title, string IdentityHeading, string DetailHeading, string MetadataHeading,
@@ -15,7 +13,7 @@ public sealed record AdminRecordList(
 
 public static class AdminRecords
 {
-    public static AdminRecordList? Get(string key, PortfolioPage portfolio) => key switch
+    public static AdminRecordList? Get(string key, PortfolioPage portfolio, AdminUser[]? users = null) => key switch
     {
         "works" => new(key, "Projects", "Project", "Category", "Technologies",
             portfolio.Projects.Select(ProjectRow).ToArray(), "project"),
@@ -24,30 +22,12 @@ public static class AdminRecords
         "team" => new(key, "Team", "Team member", "Role", "Technologies",
             portfolio.Team.Select(TeamRow).ToArray(), "team member"),
         "users" => new(key, "User accounts", "User", "Status", "Joined",
-            AdminPreview.Users.Select(UserRow).ToArray()),
+            (users ?? []).Select(UserRow).ToArray()),
         _ => null
     };
 
     public static AdminRecordPage? Find(string sectionKey, string recordKey, PortfolioPage portfolio)
     {
-        if (sectionKey == "activity")
-        {
-            if (!int.TryParse(recordKey, NumberStyles.None, CultureInfo.InvariantCulture, out var index) ||
-                index < 1 || index > AdminPreview.Events.Count) return null;
-
-            var item = AdminPreview.Events[index - 1];
-            return new(item.Action, [], Activity: item);
-        }
-
-        if (sectionKey == "users")
-        {
-            if (!int.TryParse(recordKey, NumberStyles.None, CultureInfo.InvariantCulture, out var index) ||
-                index < 1 || index > AdminPreview.Users.Count || recordKey != index.ToString(CultureInfo.InvariantCulture)) return null;
-
-            var user = AdminPreview.Users[index - 1];
-            return new(user.Name, [], User: user);
-        }
-
         var collection = Get(sectionKey, portfolio);
         if (collection is null) return null;
 
@@ -103,11 +83,11 @@ public static class AdminRecords
 
     private static AdminRecordRow TeamRow(TeamMember member) =>
         new(member.Id, member.Name, member.FullName ?? "", member.Role,
-            string.Join(", ", member.Stack), TeamFields(member), Image: $"portrait-{member.Id}.webp");
+            string.Join(", ", member.Stack), TeamFields(member), Image: member.Portrait);
 
     private static AdminField[] TeamFields(TeamMember? member) =>
         [
-            new("Portrait", "", Type: "image", Images: member is null ? [] : [$"portrait-{member.Id}.webp"], ImageStyle: "logo"),
+            new("Portrait", "", Type: "image", Images: member?.Portrait is { } portrait ? [portrait] : [], ImageStyle: "logo"),
             new("Display name", member?.Name ?? "", Required: true),
             new("Full name", member?.FullName ?? ""),
             new("Role", member?.Role ?? "", Required: true),
@@ -117,8 +97,8 @@ public static class AdminRecords
             new("Bio", member?.Bio ?? "", Multiline: true, Required: true)
         ];
 
-    private static AdminRecordRow UserRow(AdminUser user, int index) =>
-        new((index + 1).ToString(CultureInfo.InvariantCulture), user.Name, user.Email,
+    private static AdminRecordRow UserRow(AdminUser user) =>
+        new(user.Id, user.Name, user.Email,
             user.Active ? "Active" : "Inactive", user.Joined.ToString("MMM d, yyyy"),
-            [], Initials: user.Initials, Active: user.Active);
+            [], Initials: user.Initials, Active: user.Active, CanChangeStatus: !user.IsAdministrator);
 }

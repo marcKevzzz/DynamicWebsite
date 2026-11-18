@@ -58,6 +58,7 @@
 .account-submit { width: 100%; min-height: 54px; margin-top: 4px; padding-inline: 22px; border-color: var(--fg); background: var(--fg); color: var(--bg); font-size: 14px; }
 :is(.account-form-sign-up, .account-form-recovery) .account-submit { margin-top: 12px; }
 .account-submit:hover { border-color: var(--accent); background: var(--accent); color: var(--on-accent); }
+[data-profile-save] .account-submit { margin-top: 20px; }
 .account-submit:disabled { opacity: .65; cursor: wait; }
 .account-form[aria-busy="true"] .account-submit svg { display: none; }
 .account-form[aria-busy="true"] .account-submit::after {

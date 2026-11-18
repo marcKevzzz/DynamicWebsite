@@ -13,14 +13,17 @@
             var row = Model.Rows[index];
             var rowId = $"admin-row-{index}";
             <li>
-                @if (row.Active is { } enabled)
+                @if (row.CanChangeStatus && row.Active is { } enabled)
                 {
                     var action = enabled ? "Deactivate" : "Activate";
-                    <button class="button admin-account-toggle" type="button" data-user-name="@row.Title" data-active="@(enabled ? "true" : "false")" aria-label="@action @row.Title" hidden>
-                        <span class="disable-icon"><partial name="_AdminIcon" model='"minus"' /></span>
-                        <span class="enable-icon"><partial name="_AdminIcon" model='"plus"' /></span>
-                        <span data-action-label>@action</span>
-                    </button>
+                    <form method="post" asp-controller="Admin" asp-action="SetStatus" asp-route-recordKey="@row.Key">
+                        <input type="hidden" name="active" value="@(enabled ? "false" : "true")" />
+                        <button class="button admin-account-toggle" type="submit" data-user-name="@row.Title" data-active="@(enabled ? "true" : "false")" aria-label="@action @row.Title">
+                            <span class="disable-icon"><partial name="_AdminIcon" model='"minus"' /></span>
+                            <span class="enable-icon"><partial name="_AdminIcon" model='"plus"' /></span>
+                            <span data-action-label>@action</span>
+                        </button>
+                    </form>
                 }
                 <a class="admin-record-grid admin-record-link" asp-controller="Admin" asp-action="Record"
                    asp-route-sectionKey="@Model.Key" asp-route-recordKey="@row.Key"

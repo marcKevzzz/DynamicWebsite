@@ -59,7 +59,7 @@ export async function smoke(tab) {
   const member = ui.getByRole('link', { name: 'Pixyz', exact: true })
   await member.click()
   const profile = ui.getByRole('dialog', { name: 'Pixyz', exact: true })
-  assert(await profile.getByRole('heading', { name: 'Pixyz' }).isVisible(), 'Selected teammate opens')
+  assert(await profile.getByRole('heading', { name: 'Pixyz', exact: true }).isVisible(), 'Selected teammate opens')
   assert(await profile.evaluate(el => {
     const track = el.querySelector('.team-track')
     return track.querySelector('.team-profile').clientHeight === track.clientHeight
@@ -70,9 +70,9 @@ export async function smoke(tab) {
   await profile.getByRole('heading', { name: 'Other team members' }).waitFor({ state: 'visible' })
   assert(await profile.getByRole('link', { name: 'Pixyz', exact: true }).count() === 0, 'The final chapter excludes the active teammate')
   await profile.getByRole('link', { name: 'Leo', exact: true }).click()
-  assert(await profile.getByRole('button', { name: 'Close profile' }).evaluate(el => el.style.getPropertyValue('--team-progress')) === '0turn', 'The close indicator resets for each teammate')
   const nextProfile = ui.getByRole('dialog', { name: 'Leo', exact: true })
-  assert(await nextProfile.getByRole('heading', { name: 'Leo' }).isVisible(), 'Next teammate resets to the overview')
+  assert(await nextProfile.getByRole('button', { name: 'Close profile' }).evaluate(el => el.style.getPropertyValue('--team-progress')) === '0turn', 'The close indicator resets for each teammate')
+  assert(await nextProfile.getByRole('heading', { name: 'Leo', exact: true }).isVisible(), 'Next teammate resets to the overview')
   await nextProfile.getByRole('button', { name: 'Close profile' }).press('Escape')
   await nextProfile.waitFor({ state: 'hidden' })
   assert(await member.evaluate(el => el === document.activeElement), 'Closing a profile restores focus to the roster')

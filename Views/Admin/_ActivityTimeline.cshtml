@@ -1,8 +1,6 @@
+@model AdminPage
 @{
-    var groups = AdminPreview.Events
-        .Select((item, index) => (Item: item, Key: index + 1))
-        .OrderByDescending(entry => entry.Item.OccurredAt)
-        .GroupBy(entry => DateOnly.FromDateTime(entry.Item.OccurredAt));
+    var groups = Model.Events.GroupBy(entry => DateOnly.FromDateTime(entry.OccurredAt));
 }
 <div class="admin-panel admin-activity-list" data-activity-list>
     @foreach (var group in groups)
@@ -14,13 +12,13 @@
                 @foreach (var entry in group)
                 {
                     <li>
-                        <a class="admin-timeline-row" asp-action="Record" asp-route-sectionKey="activity" asp-route-recordKey="@entry.Key">
-                            <time class="admin-timeline-time" datetime="@entry.Item.OccurredAt.ToString("s")">@entry.Item.OccurredAt.ToString("h:mm tt")</time>
+                        <a class="admin-timeline-row" asp-action="Record" asp-route-sectionKey="activity" asp-route-recordKey="@entry.Id">
+                            <time class="admin-timeline-time" datetime="@entry.OccurredAt.ToString("s")">@entry.OccurredAt.ToString("h:mm tt")</time>
                             <span class="admin-timeline-event">
-                                <span class="admin-row-icon"><partial name="_AdminIcon" model="entry.Item.Icon" /></span>
-                                <span class="admin-row-copy"><strong>@entry.Item.Action</strong><span>@entry.Item.Subject</span></span>
+                                <span class="admin-row-icon"><partial name="_AdminIcon" model="entry.Icon" /></span>
+                                <span class="admin-row-copy"><strong>@entry.Action</strong><span>@entry.Subject</span></span>
                             </span>
-                            <span class="admin-timeline-actor">@entry.Item.Actor</span>
+                            <span class="admin-timeline-actor">@entry.Actor</span>
                             <span class="admin-timeline-arrow"><partial name="_AdminIcon" model='"arrow-right"' /></span>
                         </a>
                     </li>
@@ -28,5 +26,5 @@
             </ul>
         </section>
     }
-    <p class="admin-timeline-empty" data-activity-empty hidden>No activity in this date range.</p>
+    <p class="admin-timeline-empty" data-activity-empty hidden="@(Model.Events.Length > 0)">No activity in this date range.</p>
 </div>

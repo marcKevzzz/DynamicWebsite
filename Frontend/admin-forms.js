@@ -1,13 +1,14 @@
 import { attachToasts } from './toasts.js'
 import { confirmAdminAction } from './admin-confirm.js'
 
-const imageType = /^image\/(png|jpeg|webp|svg\+xml|gif|avif)$/i
-const imageExtension = /\.(png|jpe?g|webp|svg|gif|avif)$/i
-const imageTypeError = 'Choose a PNG, JPG, WebP, SVG, GIF, or AVIF image.'
+const imageType = /^image\/(png|jpeg|webp|gif)$/i
+const imageExtension = /\.(png|jpe?g|webp|gif)$/i
+const imageTypeError = 'Choose a PNG, JPG, WebP, or GIF image.'
 
 function imagePreview(file, removable) {
   const row = document.createElement('li')
   row.className = 'admin-image-tile'
+  row.upload = file
   const preview = document.createElement('img')
   preview.alt = ''
   preview.draggable = false
@@ -42,6 +43,20 @@ function removeImage(item) {
 function attachImageInput(input, refresh) {
   const field = input.closest('.admin-image-field')
   const list = field.querySelector('[data-admin-images]')
+  for (const control of list.querySelectorAll('[data-native-retain]')) control.hidden = true
+  input.form.addEventListener('formdata', ({ formData }) => {
+    formData.delete('Images')
+    formData.delete('Uploads')
+    let index = 0
+    for (const tile of list.children) {
+      if (tile.upload) {
+        formData.append('Images', 'new:' + index++)
+        formData.append('Uploads', tile.upload)
+      } else {
+        formData.append('Images', tile.dataset.imagePath)
+      }
+    }
+  })
   const isLogo = field.dataset.imageStyle === 'logo'
   const isStack = field.dataset.imageStyle === 'stack'
   const usesPrimary = field.closest('.admin-fields').dataset.layout !== 'home'
@@ -168,6 +183,14 @@ function validationMessage(input) {
 
 function attachChips(container, reducedMotion) {
   const input = container.querySelector('[data-chip-input]')
+  const value = container.previousElementSibling
+  container.hidden = false
+  value.hidden = true
+  input.id = value.id
+  value.removeAttribute('id')
+  value.form.addEventListener('formdata', ({ formData }) => {
+    formData.set(value.name, [...container.querySelectorAll('.admin-chip > span')].map(chip => chip.textContent).join(', '))
+  })
 
   function commit() {
     const chips = [...container.querySelectorAll('.admin-chip > span')]
@@ -220,7 +243,7 @@ function attachChips(container, reducedMotion) {
   return commit
 }
 
-export function attachAdminForms(gsap, saveProfile) {
+export function attachAdminForms(gsap) {
   const forms = [...document.querySelectorAll('[data-admin-form]:has([data-admin-input]:not([readonly]))')]
   if (!forms.length) return
 
@@ -236,14 +259,12 @@ export function attachAdminForms(gsap, saveProfile) {
   const notify = attachToasts(notifications, announcer, origin => origin?.isConnected ? origin : null)
   if (document.body.dataset.signedIn === 'true') notify('Signed in', 'Welcome to the admin dashboard.', 'success')
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)')
-  const owner = document.querySelector('[data-admin-owner]')
-  owner?.addEventListener('click', async () => {
-    if (owner.getAttribute('aria-disabled') === 'true') return
-    if (!await confirmAdminAction('Set this team member as owner?', 'Set as owner', 'This selects the owner for the current preview.')) return
-    owner.textContent = 'Owner'
-    owner.setAttribute('aria-disabled', 'true')
-    notify('Owner selected', 'Changes stay on this page.')
-  })
+  for (const form of document.querySelectorAll('[data-confirm-content]')) {
+    form.addEventListener('submit', async event => {
+      event.preventDefault()
+      if (await confirmAdminAction(form.dataset.confirmContent, event.submitter.textContent.trim(), 'The published portfolio will update immediately.')) form.submit()
+    })
+  }
 
   for (const form of forms) {
     const inputs = [...form.querySelectorAll('[data-admin-input]:not([readonly])')]
@@ -283,11 +304,7 @@ export function attachAdminForms(gsap, saveProfile) {
         return
       }
       const action = event.submitter?.textContent.trim() || 'Save changes'
-      if (form.closest('#admin-profile')) {
-        if (await confirmAdminAction('Save profile changes?', action, 'Your updated name will be saved in this browser.')) saveProfile()
-      } else if (await confirmAdminAction(action + '?', action, 'Your edits apply to the current preview page.')) {
-        notify('Preview complete', 'Changes stay on this page.')
-      }
+      if (await confirmAdminAction(action + '?', action, 'Your changes will be visible on the portfolio.')) form.submit()
     })
   }
 }

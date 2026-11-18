@@ -2,7 +2,7 @@
 @{
     var siteUrl = $"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.PathBase}/";
     var shareImage = $"{Context.Request.Scheme}://{Context.Request.Host}{Url.Content("~/images/dcd-share.png")}";
-    const string description = "dcd.studio designs, builds, and deploys websites and software systems.";
+    var description = Model.Company.Description;
 }
 <!doctype html>
 <html lang="en">
@@ -12,8 +12,8 @@
     <meta name="theme-color" content="#1b1b1b" />
     <meta name="description" content="@description" />
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="dcd.studio" />
-    <meta property="og:title" content="dcd.studio" />
+    <meta property="og:site_name" content="@Model.Company.Name" />
+    <meta property="og:title" content="@Model.Company.Name" />
     <meta property="og:description" content="@description" />
     <meta property="og:url" content="@siteUrl" />
     <meta property="og:image" content="@shareImage" />
@@ -22,12 +22,15 @@
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="dcd. logo on a dark background" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="dcd.studio" />
+    <meta name="twitter:title" content="@Model.Company.Name" />
     <meta name="twitter:description" content="@description" />
     <meta name="twitter:image" content="@shareImage" />
     <meta name="twitter:image:alt" content="dcd. logo on a dark background" />
-    <title>dcd.studio</title>
-    <link rel="icon" type="image/svg+xml" href="~/favicon.svg" />
+    <title>@Model.Company.Name</title>
+    @if (Model.Company.Logo is { } logo)
+    {
+        <link rel="icon" href="@Url.Content(logo.StartsWith('/') ? "~" + logo : "~/images/" + logo)" />
+    }
     <link rel="stylesheet" href="~/assets/site.css" asp-append-version="true" />
     <script src="~/js/appearance.js" asp-append-version="true"></script>
     <script type="module" src="~/assets/site.js" asp-append-version="true"></script>
@@ -42,8 +45,9 @@
         <a class="skip-link" href="#main">Skip to content</a>
         <partial name="_Header" model="Model.Navigation" />
         <main id="main">@RenderBody()</main>
-        <partial name="_Footer" model="Model.Navigation" />
+        <partial name="_Footer" model="Model" />
         <partial name="_Shortcuts" model="Model.Navigation" />
     </div>
+    <partial name="_ConfirmDialog" />
 </body>
 </html>

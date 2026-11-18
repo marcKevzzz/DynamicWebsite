@@ -3,6 +3,8 @@ export function animateWorkGallery(gsap, ScrollTrigger) {
   const counter = work.querySelector('.work-current')
   const items = [...work.querySelectorAll('.work-item')]
 
+  if (!items.length) return
+
   function updateCount() {
     let current = 0
     let closest = Infinity

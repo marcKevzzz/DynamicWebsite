@@ -26,6 +26,16 @@
   background: #0008;
   backdrop-filter: blur(10px);
 }
+@media (prefers-reduced-motion: no-preference) {
+  .shortcut-dialog { opacity: 0; transform: translateY(10px) scale(.98); transition: opacity 220ms, transform 220ms ease-out, display 220ms allow-discrete, overlay 220ms allow-discrete; }
+  .shortcut-dialog[open] { opacity: 1; transform: none; }
+  .shortcut-dialog::backdrop { opacity: 0; transition: opacity 220ms, display 220ms allow-discrete, overlay 220ms allow-discrete; }
+  .shortcut-dialog[open]::backdrop { opacity: 1; }
+  @starting-style {
+    .shortcut-dialog[open], .shortcut-dialog[open]::backdrop { opacity: 0; }
+    .shortcut-dialog[open] { transform: translateY(10px) scale(.98); }
+  }
+}
 .command-search {
   display: flex;
   align-items: center;

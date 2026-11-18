@@ -6,6 +6,8 @@
     @for (var index = 0; index < Model.Fields.Length; index++)
     {
         var field = Model.Fields[index];
+        if (ViewData["Draft"] is ContentEdit draft && field.Type != "image")
+            field = field with { Value = draft.Value(field.Label) };
         var id = $"{formId}-{index}";
         var messageId = $"{id}-message";
         var required = Model.Editable && field.Required;
@@ -26,7 +28,11 @@
                         {
                             var source = image.StartsWith("~/") ? image : image.StartsWith('/') ? $"~{image}" : $"~/images/{image}";
                             var name = System.IO.Path.GetFileName(image);
-                            <li class="admin-image-tile">
+                            <li class="admin-image-tile" data-image-path="@image">
+                                @if (Model.Editable)
+                                {
+                                    <label data-native-retain><input type="checkbox" name="Images" value="@image" checked /> Keep @name</label>
+                                }
                                 <button type="button" class="admin-image-open" data-admin-image-open aria-label="Preview @name">
                                     <img src="@Url.Content(source)" alt="" draggable="false" />
                                 </button>
@@ -42,8 +48,8 @@
                     </ul>
                     @if (Model.Editable)
                     {
-                        <input id="@id" class="admin-image-input sr-only" type="file" multiple="@field.Multiple"
-                               accept=".png,.jpg,.jpeg,.webp,.svg,.gif,.avif"
+                        <input id="@id" class="admin-image-input sr-only" type="file" name="Uploads" multiple="@field.Multiple"
+                               accept=".png,.jpg,.jpeg,.webp,.gif"
                                aria-required="@required.ToString().ToLowerInvariant()" aria-describedby="@messageId"
                                data-admin-input data-label="@field.Label" />
                         @if (field.ImageStyle == "stack")
@@ -69,18 +75,19 @@
             }
             else if (field.Multiline)
             {
-                <textarea id="@id" class="admin-input" data-admin-input data-label="@field.Label"
+                <textarea name="Fields[@field.Label]" id="@id" class="admin-input" data-admin-input data-label="@field.Label"
                           readonly="@(!Model.Editable)" required="@required" rows="@(Model.Layout == "home" ? 3 : 4)"
                           aria-describedby="@(Model.Editable ? messageId : null)">@field.Value</textarea>
             }
             else if (field.Type == "chips")
             {
-                <div class="admin-chips">
+                <input class="admin-input" name="Fields[@field.Label]" value="@field.Value" id="@id" data-chips-value />
+                <div class="admin-chips" hidden>
                     @foreach (var chip in field.Value.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
                     {
                         <span class="admin-chip"><span>@chip</span><button type="button" data-remove-chip aria-label="Remove @chip">×</button></span>
                     }
-                    <input id="@id" type="text" data-chip-input placeholder="Add @field.Label.ToLowerInvariant()" autocomplete="off" />
+                    <input aria-label="@field.Label" type="text" data-chip-input placeholder="Add @field.Label.ToLowerInvariant()" autocomplete="off" />
                 </div>
             }
             else
@@ -90,7 +97,7 @@
                     {
                         <span class="admin-input-icon"><partial name="_AdminIcon" model="icon" /></span>
                     }
-                    <input id="@id" class="admin-input" type="@field.Type" data-admin-input data-label="@field.Label"
+                    <input name="Fields[@field.Label]" id="@id" class="admin-input" type="@field.Type" data-admin-input data-label="@field.Label"
                            readonly="@(!Model.Editable)" required="@required" value="@field.Value"
                            placeholder="@(field.Type == "email" ? "you@example.com" : field.Type == "url" ? "https://example.com" : null)"
                            aria-describedby="@(Model.Editable ? messageId : null)" />

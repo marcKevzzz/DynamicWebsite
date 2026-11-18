@@ -1,24 +1,25 @@
 @model AdminPage
 @{
     var reports = Model.Section.Key == "reports";
-    var latestDay = AdminAnalytics.Days[^1];
-    var previousMonth = AdminAnalytics.Days.Last(day => day.Date.Month != latestDay.Date.Month);
+    var days = Model.Days;
+    var latestDay = days[^1];
+    var months = days.GroupBy(day => new DateOnly(day.Date.Year, day.Date.Month, 1))
+        .Select(group => (Date: group.Key, Count: group.Sum(day => day.Signups), Last: group.Last())).ToArray();
+    var previousMonth = months.Length > 1 ? months[^2].Last : null;
     var total = latestDay.Total;
     var inactive = latestDay.Inactive;
     var active = total - inactive;
-    var activePercent = active * 100 / total;
-    var latest = reports ? total : AdminPreview.Signups[^1].Count;
-    var previous = AdminPreview.Signups[^2].Count;
-    var signupChange = (latest - previous) * 100 / previous;
-    var inactiveChange = inactive - previousMonth.Inactive;
-    var activeChange = active - (previousMonth.Total - previousMonth.Inactive);
-    var range = $"{AdminAnalytics.FirstDay:MMM d} – {AdminAnalytics.LastDay:MMM d, yyyy}";
+    var activePercent = total == 0 ? 0 : (int)Math.Round(active * 100.0 / total);
+    var previousSignups = months.Length > 1 ? months[^2].Count : 0;
+    var signupChange = previousSignups == 0 ? (int?)null : (int)Math.Round((months[^1].Count - previousSignups) * 100.0 / previousSignups);
+    var range = $"{days[0].Date:MMM d} – {latestDay.Date:MMM d, yyyy} UTC";
+    var step = Math.Max(1, (int)Math.Ceiling(months.Max(month => month.Count) / 5.0));
     var metrics = new[]
     {
-        (Label: "Total users", Value: total, Change: total - previousMonth.Total, Positive: true),
-        (Label: "Active users", Value: active, Change: activeChange, Positive: true),
-        (Label: "Inactive users", Value: inactive, Change: inactiveChange, Positive: true),
-        (Label: reports ? "Sign-ups" : "Monthly sign-ups", Value: latest, Change: signupChange, Positive: false)
+        (Label: "Total users", Value: total, Change: total - previousMonth?.Total, Positive: true),
+        (Label: "Active users", Value: active, Change: active - (previousMonth?.Total - previousMonth?.Inactive), Positive: true),
+        (Label: "Inactive users", Value: inactive, Change: inactive - previousMonth?.Inactive, Positive: false),
+        (Label: reports ? "Sign-ups" : "Monthly sign-ups", Value: reports ? total : months[^1].Count, Change: signupChange, Positive: true)
     };
     var content = new[]
     {
@@ -27,24 +28,24 @@
         (Label: "Team members", Count: Model.Portfolio.Team.Length, Key: "team")
     };
 }
-<script type="application/json" data-analytics-data>@Html.Raw(System.Text.Json.JsonSerializer.Serialize(AdminAnalytics.Days, System.Text.Json.JsonSerializerOptions.Web))</script>
+<script type="application/json" data-analytics-data>@Html.Raw(System.Text.Json.JsonSerializer.Serialize(days, System.Text.Json.JsonSerializerOptions.Web))</script>
 <span class="sr-only" role="status" data-analytics-announcement></span>
 <dl class="admin-metrics" data-analytics-metrics>
     @for (var index = 0; index < metrics.Length; index++)
     {
         var metric = metrics[index];
-        var change = metric.Change.ToString("+0;−0;0") + (index == 3 ? "%" : "");
+        var change = metric.Change?.ToString("+0;−0;0") + (index == 3 ? "%" : "");
         <div class="admin-metric @(index == 0 ? "admin-metric-featured" : "")">
             <dt data-metric-label>@metric.Label</dt>
             <dd>
                 <strong data-metric-value>@metric.Value</strong>
                 <span class="admin-metric-comparison">
-                    <span class="admin-trend" data-positive="@(!reports && metric.Positive ? "true" : "false")" data-metric-trend>
-                        <span data-metric-direction="up" hidden="@(reports || metric.Change <= 0)"><partial name="_AdminIcon" model='"trend-up"' /></span>
-                        <span data-metric-direction="down" hidden="@(reports || metric.Change >= 0)"><partial name="_AdminIcon" model='"trend-down"' /></span>
-                        <span data-metric-change>@(reports ? "—" : change)</span>
+                    <span class="admin-trend" data-positive="@(!reports && (metric.Positive ? metric.Change > 0 : metric.Change < 0) ? "true" : "false")" data-metric-trend>
+                        <span data-metric-direction="up" hidden="@(reports || !(metric.Change > 0))"><partial name="_AdminIcon" model='"trend-up"' /></span>
+                        <span data-metric-direction="down" hidden="@(reports || !(metric.Change < 0))"><partial name="_AdminIcon" model='"trend-down"' /></span>
+                        <span data-metric-change>@(reports || metric.Change is null ? "—" : change)</span>
                     </span>
-                    <span data-metric-comparison>@(reports ? "No earlier data" : "vs. last month")</span>
+                    <span data-metric-comparison>@(reports || metric.Change is null ? "No earlier data" : "vs. last month")</span>
                 </span>
             </dd>
         </div>
@@ -57,18 +58,18 @@
             <span class="admin-period"><partial name="_AdminIcon" model='"calendar"' /> <span data-analytics-range>@range</span></span>
         </header>
         <div class="admin-chart">
-            <div class="admin-chart-scale mono" aria-hidden="true"><span>40</span><span>32</span><span>24</span><span>16</span><span>8</span><span>0</span></div>
-            <ul class="admin-bars" role="list" aria-label="Sign-ups by period" style="--plot-columns: @AdminPreview.Signups.Count">
-                @for (var monthIndex = 0; monthIndex < AdminPreview.Signups.Count; monthIndex++)
+            <div class="admin-chart-scale mono" aria-hidden="true">@for (var tick = 5; tick >= 0; tick--) { <span>@(tick * step)</span> }</div>
+            <ul class="admin-bars" role="list" aria-label="Sign-ups by period" style="--plot-columns: @months.Length; --plot-maximum: @(step * 5)">
+                @for (var monthIndex = 0; monthIndex < months.Length; monthIndex++)
                 {
-                    var period = AdminPreview.Signups[monthIndex];
-                    var dateLabel = AdminAnalytics.FirstDay.AddMonths(monthIndex).ToString("MMMM yyyy");
-                    <li class="admin-bar" data-current="@(monthIndex == AdminPreview.Signups.Count - 1 ? "true" : "false")" style="--bar-count: @period.Count">
+                    var period = months[monthIndex];
+                    var dateLabel = period.Date.ToString("MMMM yyyy");
+                    <li class="admin-bar" data-current="@(monthIndex == months.Length - 1 ? "true" : "false")" style="--bar-count: @period.Count">
                         <button type="button" class="admin-chart-point" aria-pressed="false" aria-label="@dateLabel, @period.Count sign-ups">
                             <span class="admin-bar-plot">
                                 <span class="admin-bar-fill"><strong data-point-value>@period.Count</strong></span>
                             </span>
-                            <span class="admin-bar-label mono" data-point-label>@period.Label</span>
+                            <span class="admin-bar-label mono" data-point-label>@period.Date.ToString("MMM")</span>
                             <span class="admin-chart-tooltip" aria-hidden="true"><span data-point-date>@dateLabel</span><strong data-point-count>@period.Count sign-ups</strong></span>
                         </button>
                     </li>
@@ -113,7 +114,7 @@
                 <h2 id="recent-activity-title">Recent activity</h2>
                 <a class="admin-stat-arrow" asp-controller="Admin" asp-action="Index" asp-route-sectionKey="activity" aria-label="View all activity"><partial name="_AdminIcon" model='"arrow-up-right"' /></a>
             </header>
-            <partial name="_Activity" model="AdminPreview.Events.OrderByDescending(item => item.OccurredAt).Take(10)" />
+            <partial name="_Activity" model="Model.Events" />
         </section>
     }
 </div>
@@ -130,11 +131,4 @@
                 </li>
             }
         </ul>
-    @if (!reports)
-    {
-        <section class="admin-panel admin-preview-status" aria-labelledby="preview-status-title">
-            <h2 id="preview-status-title">Preview status</h2>
-            <span class="admin-status" data-active="true">Available</span>
-        </section>
-    }
 </div>

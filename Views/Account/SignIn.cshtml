@@ -5,6 +5,7 @@
 }
 <h1 id="account-title" class="account-title account-title-single">Welcome back.</h1>
 <p class="account-description">Sign in to explore our latest projects and the people behind them.</p>
+@if (TempData["AccountNotice"] is string notice) { <p role="status">@notice</p> }
 <form asp-action="SignIn" asp-route-returnUrl="@Context.Request.Query["ReturnUrl"]" method="post" class="account-form" data-account-form data-sign-in data-logged-out="@(TempData["AdminLoggedOut"] as bool? == true ? "true" : null)">
     @if (ViewData.ModelState.TryGetValue("", out var signInErrors) && signInErrors.Errors.Count > 0)
     {

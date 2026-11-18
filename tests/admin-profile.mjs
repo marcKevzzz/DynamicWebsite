@@ -1,0 +1,21 @@
+// Run against an authenticated administrator in a disposable database.
+export async function checkAdminProfile(page) {
+  await page.goto(new URL('/admin/users', page.url()).href, { waitUntil: 'domcontentloaded' })
+  const opener = page.getByRole('link', { name: 'My profile' })
+  await opener.click()
+  const dialog = page.getByRole('dialog', { name: 'Admin profile' })
+  const name = dialog.getByLabel('First name')
+  const original = await name.inputValue()
+  await name.fill('Dialog check')
+  await dialog.getByRole('button', { name: 'Save profile' }).click()
+  await dialog.getByText('Your profile has been saved.').waitFor()
+  await name.press('Escape')
+  if (!await opener.evaluate(link => link === document.activeElement)) throw Error('Profile focus was not restored')
+  await page.reload()
+  await opener.click()
+  if (await name.inputValue() !== 'Dialog check') throw Error('Profile change did not persist')
+  await name.fill(original)
+  await dialog.getByRole('button', { name: 'Save profile' }).click()
+  await dialog.getByText('Your profile has been saved.').waitFor()
+  await name.press('Escape')
+}

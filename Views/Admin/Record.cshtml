@@ -2,6 +2,8 @@
 @{
     Layout = "_AdminLayout";
     var record = Model.Record!;
+    var key = Context.Request.RouteValues["recordKey"]?.ToString() ?? "new";
+    var revision = Model.Portfolio.Revisions.GetValueOrDefault((Model.Section.Key, key));
     var editable = record.SaveLabel is not null;
 }
 
@@ -11,7 +13,17 @@
         <div class="admin-record-actions">
             @if (record.IsOwner is { } isOwner)
             {
-                <button class="button" type="button" data-admin-owner aria-disabled="@(isOwner ? "true" : "false")">@(isOwner ? "Owner" : "Set as owner")</button>
+                <form asp-controller="AdminContent" asp-action="Owner" asp-route-sectionKey="team" asp-route-recordKey="@key" method="post" data-confirm-content="Set this team member as owner?">
+                    <input type="hidden" name="Revision" value="@revision" />
+                    <button class="button" type="submit" data-admin-owner disabled="@isOwner">@(isOwner ? "Owner" : "Set as owner")</button>
+                </form>
+            }
+            @if (key != "new" && record.IsOwner != true)
+            {
+                <form asp-controller="AdminContent" asp-action="Delete" asp-route-sectionKey="@Model.Section.Key" asp-route-recordKey="@key" method="post" data-confirm-content="Remove this record from the portfolio?">
+                    <input type="hidden" name="Revision" value="@revision" />
+                    <button class="button" type="submit">Remove</button>
+                </form>
             }
             <button class="button button-primary" type="submit" form="admin-page-form">
                 @record.SaveLabel <partial name="_AdminIcon" model='"arrow-up-right"' />
@@ -22,7 +34,10 @@
 
 @if (editable)
 {
-    <form id="admin-page-form" class="admin-panel admin-single-panel" aria-label="@record.Title" data-admin-form>
+    <form asp-controller="AdminContent" asp-action="Save" asp-route-sectionKey="@Model.Section.Key" asp-route-recordKey="@key"
+          method="post" enctype="multipart/form-data" id="admin-page-form" class="admin-panel admin-single-panel" aria-label="@record.Title" data-admin-form>
+        <div asp-validation-summary="All" role="alert"></div>
+        <input type="hidden" name="Revision" value="@revision" />
         <partial name="_Fields" model="new AdminForm(record.Fields, true, Model.Section.Key)" />
     </form>
 }
@@ -39,7 +54,7 @@ else if (record.User is { } user)
         </div>
         <dl class="admin-detail-meta">
             <div><dt>Joined</dt><dd><time datetime="@user.Joined.ToString("yyyy-MM-dd")">@user.Joined.ToString("MMM d, yyyy")</time></dd></div>
-            <div><dt>Last sign-in (sample)</dt><dd>@user.LastSignIn</dd></div>
+            <div><dt>Last sign-in (UTC)</dt><dd>@(user.LastSignIn?.ToString("MMM d, yyyy · h:mm tt") ?? "Never")</dd></div>
         </dl>
     </section>
 }

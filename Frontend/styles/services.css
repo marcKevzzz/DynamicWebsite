@@ -47,9 +47,8 @@
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 50%;
-  width: 100vw;
-  transform: translateX(-50%) scaleY(0);
+  inset-inline: 0;
+  transform: scaleY(0);
   transform-origin: var(--origin);
   background: var(--fg);
   transition: transform 0.4s cubic-bezier(0.65, 0, 0.35, 1);
@@ -57,7 +56,7 @@
   pointer-events: none;
 }
 .service__link:hover:before {
-  transform: translateX(-50%) scaleY(1);
+  transform: scaleY(1);
   transform-origin: var(--origin);
 }
 .service__link:hover {
@@ -112,11 +111,11 @@
 .service-row:nth-child(2) .service__tag:nth-child(1) { --icon-drop: 6px; }
 .service-row:nth-child(2) .service__tag:nth-child(2) { --icon-drop: -5px; margin-inline-start: 4px; }
 .service-row:nth-child(2) .service__tag:nth-child(4) { --icon-drop: 10px; }
-.service-row:nth-child(3) .service__tag:nth-child(1) { --icon-drop: 14px; order: 1; margin-inline-start: 5px; }
+.service-row:nth-child(3) .service__tag:nth-child(1) { --icon-drop: 14px; margin-inline-start: 5px; }
 .service-row:nth-child(3) .service__tag:nth-child(2) { --icon-drop: 5px; }
 .service-row:nth-child(3) .service__tag:nth-child(3) { --icon-drop: 10px; margin-inline-start: 5px; }
 .service-row:nth-child(3) .service__tag:nth-child(4) { --icon-drop: -4px; }
-.service__tile {
+.service__tag {
   display: grid;
   place-items: center;
   width: 36px;
@@ -125,7 +124,7 @@
   border-radius: 50%;
   color: inherit;
 }
-.service__tile svg { width: 18px; height: 18px; }
+.service__tag svg { width: 18px; height: 18px; }
 .service__tooltip {
   position: absolute;
   z-index: 1;
@@ -143,7 +142,7 @@
   transition: opacity 160ms ease, transform 160ms ease;
 }
 .service__tag:hover .service__tooltip,
-.service__link:focus-visible .service__tooltip {
+.service__tag:focus-visible .service__tooltip {
   opacity: 1;
   transform: translate(-50%, 0);
 }

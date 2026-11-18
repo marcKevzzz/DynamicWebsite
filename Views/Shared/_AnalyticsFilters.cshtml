@@ -1,10 +1,10 @@
-@model bool
+@model AdminPage
 <div class="admin-analytics-filters" data-analytics-filters>
-    @if (Model)
+    @if (Model.Section.Key == "reports")
     {
         <div class="admin-analytics-periods" role="group" aria-label="Report period">
             <button type="button" class="admin-date-toggle" data-analytics-period="today" aria-pressed="false">Today</button>
-            <partial name="_AdminDatePicker" model='new AdminDatePicker("report-date-range", "Date range", AdminAnalytics.FirstDay, AdminAnalytics.LastDay, AdminAnalytics.FirstDay, AdminAnalytics.LastDay)' />
+            <partial name="_AdminDatePicker" model='new AdminDatePicker("report-date-range", "Date range", Model.Days[0].Date, Model.Days[^1].Date, Model.Days[0].Date, Model.Days[^1].Date)' />
         </div>
         <a class="button" asp-controller="Admin" asp-action="ExportReport" data-report-export>Export CSV</a>
     }

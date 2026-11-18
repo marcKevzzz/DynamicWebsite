@@ -6,8 +6,39 @@ public sealed record Project(string Id, string Name, string Category, string[] D
     string? LightImage = null, string? LightAlternateImage = null);
 public sealed record Service(string Number, string Title, string Body, string[] Tags, string Cursor);
 public sealed record TeamMember(string Id, string Slot, string Name, string Role, string Bio, string[] Stack,
-    string? Github, string Status, string SvgShape, string? FullName = null, string? Email = null, bool IsOwner = false);
-public sealed record PortfolioPage(NavLink[] Navigation, Project[] Projects, Service[] Services, TeamMember[] Team);
+    string? Github, string Status, string SvgShape, string? FullName = null, string? Email = null, bool IsOwner = false, string? Portrait = null, string? Thumbnail = null);
+public sealed record PortfolioPage(NavLink[] Navigation, Project[] Projects, Service[] Services, TeamMember[] Team)
+{
+    public HeroContent Home { get; init; } = new("We Decide.\nWe Build.",
+        "Web and systems engineering for creative agencies and enterprises, from the first decision to deployment.",
+        "Meet the team", "#team", ["hero-planning.webp", "hero-hole-homepage.webp", "hero-coding.webp", "hero-schedsnap-homepage.webp", "hero-monitoring.webp"]);
+    public CompanyContent Company { get; init; } = new("dcd.studio", "Decide & design. Code with intent. Deploy with care.",
+        "We’re four developers building websites and software systems. We plan around how people actually work, then carry the design and code through to production.", "/favicon.svg");
+    public ContactContent Contact { get; init; } = new("dcd.inc.mail@gmail.com", "https://github.com/dcd-inc",
+        "https://www.facebook.com/profile.php?id=61595626853093", "https://www.instagram.com/dcdstudio.dev/");
+    public Dictionary<(string Section, string Key), Guid> Revisions { get; init; } = [];
+
+    public AdminField[] SettingsFields(string section) => section switch
+    {
+        "home" => [
+            new("Collage images", "", Type: "image", Images: Home.Images, Multiple: true, ImageStyle: "stack"),
+            new("Headline", Home.Headline, true, Required: true),
+            new("Supporting text", Home.SupportingText, true, Required: true),
+            new("Button label", Home.ButtonLabel, Required: true),
+            new("Button destination", Home.Destination, Required: true, Icon: "arrow-up-right")],
+        "about" => [
+            new("Logo", "", Type: "image", Images: Company.Logo is { } logo ? [logo] : [], ImageStyle: "logo"),
+            new("Company name", Company.Name, Required: true),
+            new("Headline", Company.Headline, Required: true),
+            new("Description", Company.Description, true, Required: true)],
+        "contacts" => [
+            new("Email", Contact.Email, Type: "email", Required: true, Icon: "contacts"),
+            new("GitHub", Contact.GitHub, Type: "url", Icon: "github"),
+            new("Facebook", Contact.Facebook, Type: "url", Icon: "facebook"),
+            new("Instagram", Contact.Instagram, Type: "url", Icon: "instagram")],
+        _ => []
+    };
+}
 
 public static class Portfolio
 {

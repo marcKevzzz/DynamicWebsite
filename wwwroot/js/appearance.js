@@ -13,9 +13,11 @@
   if (!root.dataset.page && performance.getEntriesByType('navigation')[0]?.type === 'reload') {
     history.scrollRestoration = 'manual'
     if (location.hash) history.replaceState(history.state, '', location.pathname + location.search)
-    window.scrollTo(0, 0)
-    root.classList.add('reload-locked')
-    window.setTimeout(() => root.classList.remove('reload-locked'), 1000)
+    // The browser can restore the outgoing document's position after this head script runs.
+    window.addEventListener('pageshow', () => requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+      history.scrollRestoration = 'auto'
+    }), { once: true })
   }
 
   if (!root.dataset.page && !location.hash && matchMedia('(prefers-reduced-motion: no-preference)').matches) {

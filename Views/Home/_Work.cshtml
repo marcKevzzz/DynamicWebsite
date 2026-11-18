@@ -2,14 +2,14 @@
 <section id="work" class="work section-shell" aria-labelledby="work-title">
     <div class="work-index">
         <h2 id="work-title" class="mono">Works</h2>
-        <p class="work-count"><span class="work-current" aria-hidden="true">01</span><span class="outline-text" aria-hidden="true">/@Model.Length.ToString("D2")</span><span class="sr-only">@Model.Length projects</span></p>
+        <p class="work-count"><span class="work-current" aria-hidden="true">@(Model.Length == 0 ? "00" : "01")</span><span class="outline-text" aria-hidden="true">/@Model.Length.ToString("D2")</span><span class="sr-only">@Model.Length projects</span></p>
     </div>
     <ol class="work-gallery" role="list">
         @for (var i = 0; i < Model.Length; i++)
         {
             var project = Model[i];
             <li class="work-item" data-project="@project.Id" style="--work-row: @(i + 1)">
-                <a class="work-card" href="@project.Url" data-cursor="view project ↗" aria-label="@project.Name">
+                <a class="work-card" href="@(project.Url.Length > 0 ? project.Url : $"#project-{project.Id}")" data-cursor="view project ↗" aria-label="@project.Name">
                     <span class="work-frame" aria-hidden="true">
                         <span class="work-preview"><partial name="_ProjectArt" model="project" /></span>
                     </span>
@@ -22,10 +22,10 @@
             </li>
         }
     </ol>
-    <div class="team-profiles" hidden>
+    <div class="team-profiles">
         @foreach (var project in Model)
         {
-            <article class="team-card" data-project="@project.Id">
+            <article id="project-@project.Id" class="team-card" data-project="@project.Id">
                 <div class="team-chapter team-profile project-profile">
                     <h3 class="team-profile-name project-title" style="--title-size: @project.TitleSize">@project.Name</h3>
                     <figure class="team-portrait project-art">
@@ -62,9 +62,9 @@
                             {
                                 <a class="button button-small" href="@project.Github" target="_blank" rel="noopener noreferrer">View GitHub <partial name="_Arrow" /></a>
                             }
-                            @if (project.Url != project.Github)
+                            @if (project.Url.Length > 0 && project.Url != project.Github)
                             {
-                                <a class="button button-small" href="@project.Url" target="_blank" rel="noopener noreferrer">Visit project <partial name="_Arrow" /></a>
+                                <a class="button button-small" href="@(project.Url.Length > 0 ? project.Url : $"#project-{project.Id}")" target="_blank" rel="noopener noreferrer">Visit project <partial name="_Arrow" /></a>
                             }
                             <button type="button" class="team-chapter-link mono" data-team-chapter="2" aria-label="Other projects">Other projects <partial name="_Arrow" /></button>
                         </div>
@@ -85,7 +85,7 @@
                 @for (var i = 0; i < Model.Length; i++)
                 {
                     var project = Model[i];
-                    <a href="@project.Url" class="team-other project-other" aria-label="@project.Name" data-cursor="view project ↗">
+                    <a href="@(project.Url.Length > 0 ? project.Url : $"#project-{project.Id}")" class="team-other project-other" aria-label="@project.Name" data-cursor="view project ↗">
                         <span class="mono">@((i + 1).ToString("D2"))</span><span>@project.Name</span><span aria-hidden="true">↗</span>
                     </a>
                 }

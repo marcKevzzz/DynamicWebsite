@@ -84,21 +84,10 @@ attachCommands(document.querySelector('.admin-search-dialog'), {
 })
 
 const lightbox = document.querySelector('[data-admin-lightbox]')
-const profile = document.querySelector('#admin-profile')
-const profileForm = profile.querySelector('form')
-let names = {}
-try { names = JSON.parse(localStorage.getItem('admin-preview-profile')) || {} } catch {}
-function saveProfile() {
-  const firstName = profileForm.elements.firstName.value.trim()
-  const lastName = profileForm.elements.lastName.value.trim()
-  names = { firstName, lastName }
-  try { localStorage.setItem('admin-preview-profile', JSON.stringify(names)) } catch {}
-  profile.close()
-}
 document.querySelector('[data-admin-logout]').addEventListener('submit', async event => {
   event.preventDefault()
   const form = event.currentTarget
-  if (await confirmAdminAction('Log out?', 'Log out', 'You’ll leave the admin preview and return to sign in.', true)) {
+  if (await confirmAdminAction('Log out?', 'Log out', 'You’ll leave the admin workspace and return to sign in.', true)) {
     form.submit()
   }
 })
@@ -121,12 +110,8 @@ document.addEventListener('click', event => {
   }
   const opener = event.target.closest('[data-admin-open]')
   if (opener) {
-    if (opener.dataset.adminOpen === profile.id) {
-      profileForm.elements.firstName.value = names.firstName || ''
-      profileForm.elements.lastName.value = names.lastName || ''
-      profileForm.querySelectorAll('[aria-invalid]').forEach(input => input.removeAttribute('aria-invalid'))
-      profileForm.querySelectorAll('.admin-field-message').forEach(message => { message.textContent = '' })
-    }
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+    event.preventDefault()
     document.getElementById(opener.dataset.adminOpen)?.showModal()
     return
   }
@@ -137,26 +122,51 @@ document.addEventListener('click', event => {
   }
 })
 
-attachAdminForms(gsap, saveProfile)
+attachAdminForms(gsap)
+const profileDialog = document.getElementById('admin-profile')
+const profileForm = profileDialog.querySelector('form')
+const profileStatus = profileDialog.querySelector('[data-profile-status]')
+document.querySelector('[data-admin-open="admin-profile"]').setAttribute('aria-haspopup', 'dialog')
+profileDialog.addEventListener('close', () => {
+  profileForm.reset()
+  profileStatus.textContent = ''
+})
+profileForm.addEventListener('submit', async event => {
+  event.preventDefault()
+  const save = profileForm.querySelector('[type="submit"]')
+  if (save.disabled) return
+  save.disabled = true
+  try {
+    const response = await fetch(profileForm.action, {
+      method: 'POST', body: new FormData(profileForm), headers: { Accept: 'application/json' },
+    })
+    const result = await response.json()
+    if (!response.ok) throw new Error(result.errors?.join(' ') || 'Unable to save your profile.')
+    for (const [field, value] of [['FirstName', result.firstName], ['LastName', result.lastName]]) {
+      profileForm.elements[field].defaultValue = value
+      profileForm.elements[field].value = value
+    }
+    profileStatus.textContent = 'Your profile has been saved.'
+  } catch (error) {
+    profileStatus.textContent = error instanceof SyntaxError ? 'Reload the page and try again.' : error.message
+  } finally {
+    save.disabled = false
+  }
+})
 attachAdminAnalytics(gsap)
 
 for (const button of document.querySelectorAll('.admin-account-toggle')) {
-  button.hidden = false
-  button.addEventListener('click', async () => {
-    const status = button.closest('li').querySelector('.admin-status')
-    const active = status.dataset.active !== 'true'
+  button.form.addEventListener('submit', async event => {
+    event.preventDefault()
+    const active = button.dataset.active !== 'true'
     const verb = active ? 'Activate' : 'Deactivate'
-    if (!await confirmAdminAction(verb + ' ' + button.dataset.userName + '?', verb, 'Their status in this preview will change to ' + (active ? 'active.' : 'inactive.'), !active)) return
-    const action = active ? 'Deactivate' : 'Activate'
-    button.dataset.active = status.dataset.active = String(active)
-    status.textContent = active ? 'Active' : 'Inactive'
-    button.querySelector('[data-action-label]').textContent = action
-    button.setAttribute('aria-label', action + ' ' + button.dataset.userName)
+    if (await confirmAdminAction(verb + ' ' + button.dataset.userName + '?', verb,
+      active ? 'This person will be able to sign in.' : 'This person will lose access to the site.', !active)) button.form.submit()
   })
 }
 
 const activity = document.querySelector('[data-activity-list]')
-if (activity) {
+if (activity?.querySelector('[data-activity-date]')) {
   const picker = document.querySelector('[data-admin-date-picker]')
   const groups = [...activity.querySelectorAll('[data-activity-date]')]
   const empty = activity.querySelector('[data-activity-empty]')
