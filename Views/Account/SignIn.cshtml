@@ -6,7 +6,11 @@
 <h1 id="account-title" class="account-title account-title-single">Welcome back.</h1>
 <p class="account-description">Sign in to explore our latest projects and the people behind them.</p>
 <form asp-action="SignIn" asp-route-returnUrl="@Context.Request.Query["ReturnUrl"]" method="post" class="account-form" data-account-form data-sign-in data-logged-out="@(TempData["AdminLoggedOut"] as bool? == true ? "true" : null)">
-    <div asp-validation-summary="ModelOnly" class="account-status" role="alert"></div>
+    @if (ViewData.ModelState.TryGetValue("", out var signInErrors) && signInErrors.Errors.Count > 0)
+    {
+        <template data-sign-in-errors><div asp-validation-summary="ModelOnly"></div></template>
+        <noscript><div asp-validation-summary="ModelOnly" class="account-status" role="alert"></div></noscript>
+    }
     <div class="account-field">
         <label asp-for="Email"></label>
         <input asp-for="Email" type="email" autocomplete="email" inputmode="email" required maxlength="254" aria-describedby="Email-error" placeholder="you@example.com" />

@@ -17,13 +17,6 @@
         <div class="cursor__pt"><span class="cursor__ring"></span><span class="cursor__label mono"></span></div>
     </div>
     <a class="skip-link" href="#account-main">Skip to form</a>
-    <svg class="account-shape-definitions" width="0" height="0" aria-hidden="true" focusable="false">
-        <defs>
-            <clipPath id="account-image-shape" clipPathUnits="objectBoundingBox">
-                <path d="M.04 0H.835Q.875 0 .875 .032V.043Q.875 .075 .915 .075H.96Q1 .075 1 .107V.968Q1 1 .96 1H.04Q0 1 0 .968V.032Q0 0 .04 0Z" />
-            </clipPath>
-        </defs>
-    </svg>
     <div class="account-toast-announcer sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
     <section class="account-toasts" aria-label="Notifications" hidden></section>
     <div class="account-shell">
@@ -35,6 +28,9 @@
         </section>
         <aside class="account-visual" aria-label="A quiet studio workspace">
             <img src="~/images/account-studio.png" alt="A laptop and architectural paper study on a studio desk in soft evening light." fetchpriority="high" />
+            <svg class="account-close-notch" viewBox="0 0 118 118" aria-hidden="true" focusable="false">
+                <path fill="var(--bg)" d="M0 0H118V118Q118 90 90 90H70Q28 90 28 48V28Q28 0 0 0Z" />
+            </svg>
             <div class="account-visual-copy"><p>Good things<br />start here<span>.</span></p></div>
             <p class="account-visual-signature mono">Decide &amp; design.<br />Code. Deploy.</p>
         </aside>

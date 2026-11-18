@@ -10,8 +10,6 @@ attachTheme()
 const form = document.querySelector('[data-account-form]')
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)')
 
-const visual = document.querySelector('.account-visual')
-const imageShape = document.querySelector('#account-image-shape')
 const close = document.querySelector('.account-close')
 const notify = attachToasts(
   document.querySelector('.account-toasts'),
@@ -19,17 +17,6 @@ const notify = attachToasts(
   () => form?.querySelector('input:not([type="hidden"])') || close,
 )
 if (form?.dataset.loggedOut === 'true') notify('Logged out', 'Your admin session has ended.', 'success')
-new ResizeObserver(([entry]) => {
-  const { width, height } = entry.contentRect
-  if (!width || !height) return
-  const size = close.getBoundingClientRect().width
-  const notch = size + 36
-  const innerRadius = size / 2 + 16
-  const edge = width - notch
-  imageShape.setAttribute('clipPathUnits', 'userSpaceOnUse')
-  imageShape.querySelector('path').setAttribute('d',
-    `M28 0H${edge - 28}Q${edge} 0 ${edge} 28V${notch - innerRadius}Q${edge} ${notch} ${edge + innerRadius} ${notch}H${width - 28}Q${width} ${notch} ${width} ${notch + 28}V${height - 28}Q${width} ${height} ${width - 28} ${height}H28Q0 ${height} 0 ${height - 28}V28Q0 0 28 0Z`)
-}).observe(visual)
 
 if (form) {
   form.noValidate = true
@@ -156,7 +143,8 @@ if (form) {
     form.querySelector('[type="submit"]').disabled = false
   })
 
-  const summary = form.querySelector('.validation-summary-errors')
+  const summary = form.querySelector('[data-sign-in-errors]')?.content.querySelector('.validation-summary-errors')
+    ?? form.querySelector('.validation-summary-errors')
   if (summary) {
     for (const error of summary.querySelectorAll('li')) notify(form.hasAttribute('data-sign-in') ? 'Unable to sign in' : 'Unable to continue', error.textContent, 'error')
     summary.hidden = true
